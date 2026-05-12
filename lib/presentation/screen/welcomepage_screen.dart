@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -38,18 +39,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   Text(
                     "شحن آمن في ",
-                    style: TextStyle(
+                    style: GoogleFonts.cairo(
                       color: Colors.white,
                       fontSize: 35.2,
                       fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
                   ),
                   Text(
                     "متناول يديك",
-                    style: TextStyle(
+                    style: GoogleFonts.cairo(
                       color: Colors.white,
                       fontSize: 35.2,
                       fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 4,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -60,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(color: Colors.white70, fontSize: 18),
                   ),
 
-                  SizedBox(height: 30),
+                  SizedBox(height: 10),
 
                   ElevatedButton(
                     onPressed: () {
@@ -78,10 +93,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     child: Text(
                       "لنبدأ",
-                      style: TextStyle(color: AppColors.black, fontSize: 16),
+                      style: GoogleFonts.cairo(
+                        color: AppColors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 100),
+                  SizedBox(height: 20),
                 ],
               ),
             ),

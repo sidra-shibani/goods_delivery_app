@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/presentation/screen/addpassword_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OtpScreen extends StatelessWidget {
   const OtpScreen({super.key});
@@ -21,14 +22,16 @@ class OtpScreen extends StatelessWidget {
               SizedBox(height: 40),
 
               // 🔹 صورة أو أيقونة
-              Icon(Icons.sms_outlined, size: 90, color: AppColors.mainblue),
-
+              // Icon(Icons.sms_outlined, size: 90, color: AppColors.mainblue),
               SizedBox(height: 30),
 
               // 🔹 العنوان
               Text(
-                "التحقق من الرمز",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                "تأكيد رقم الهاتف",
+                style: GoogleFonts.cairo(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
 
               SizedBox(height: 10),
@@ -36,7 +39,10 @@ class OtpScreen extends StatelessWidget {
               Text(
                 "أدخل رمز التحقق المرسل إلى رقم هاتفك",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: AppColors.naturalgray),
+                style: GoogleFonts.cairo(
+                  fontSize: 16,
+                  color: AppColors.naturalgray,
+                ),
               ),
 
               SizedBox(height: 50),
@@ -55,7 +61,7 @@ class OtpScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLength: 1,
 
-                      style: TextStyle(
+                      style: GoogleFonts.cairo(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
@@ -84,8 +90,27 @@ class OtpScreen extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 50),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () {},
 
+                    child: Text(
+                      "إعادة الإرسال",
+                      style: GoogleFonts.cairo(
+                        color: AppColors.yallow,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    "يمكن إعادة ارسال الرمز",
+                    style: GoogleFonts.cairo(color: AppColors.naturalgray),
+                  ),
+                ],
+              ),
+              SizedBox(height: 70),
               // 🔹 زر التحقق
               ElevatedButton(
                 onPressed: () {
@@ -107,8 +132,8 @@ class OtpScreen extends StatelessWidget {
                 ),
 
                 child: Text(
-                  "تحقق",
-                  style: TextStyle(
+                  "تأكيد",
+                  style: GoogleFonts.cairo(
                     color: AppColors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -119,27 +144,6 @@ class OtpScreen extends StatelessWidget {
               SizedBox(height: 20),
 
               // 🔹 إعادة الإرسال
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "لم يصلك الرمز؟",
-                    style: TextStyle(color: AppColors.naturalgray),
-                  ),
-
-                  TextButton(
-                    onPressed: () {},
-
-                    child: Text(
-                      "إعادة الإرسال",
-                      style: TextStyle(
-                        color: AppColors.mainblue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),

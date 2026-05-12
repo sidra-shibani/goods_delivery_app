@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/presentation/screen/resetpassword_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/signUp_Screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isPasswordHidden = true;
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Column(
@@ -40,13 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
                   ),
 
                   child: Padding(
@@ -58,14 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         Text(
                           "مرحباً",
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           "يرجى إدخال بياناتك قبل الدخول",
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 16,
                             color: AppColors.naturalgray,
                           ),
@@ -122,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           child: Text(
                             "نسيت كلمة المرور؟",
-                            style: TextStyle(
+                            style: GoogleFonts.cairo(
                               fontSize: 16,
                               color: AppColors.mainblue,
                             ),
@@ -142,13 +137,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           child: Text(
                             "تسجيل الدخول",
-                            style: TextStyle(
+                            style: GoogleFonts.cairo(
                               color: AppColors.white,
                               fontSize: 16,
                             ),
                           ),
                         ),
-                        SizedBox(height: 30),
+                        SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -163,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               child: Text(
                                 "سجل هنا",
-                                style: TextStyle(
+                                style: GoogleFonts.cairo(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.mainblue,
@@ -172,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             Text(
                               "ليس لديك حساب؟",
-                              style: TextStyle(
+                              style: GoogleFonts.cairo(
                                 fontSize: 16,
                                 color: AppColors.naturalgray,
                               ),

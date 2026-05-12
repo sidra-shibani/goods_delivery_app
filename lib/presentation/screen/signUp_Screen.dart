@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/presentation/screen/Otp_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -24,19 +26,24 @@ class _SignupScreenState extends State<SignupScreen> {
               width: double.infinity,
 
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: Image.asset(
-                      "assets/images/Truck.png",
-                      fit: BoxFit.cover,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 130, left: 40),
+                      child: Image.asset(
+                        "assets/images/Truck.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                  SizedBox(width: 60),
+
                   Expanded(
-                    child: Image.asset(
-                      "assets/images/maptwoconnect.png",
-                      fit: BoxFit.cover,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20, right: 40),
+                      child: Image.asset(
+                        "assets/images/maptwoconnect.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ],
@@ -55,7 +62,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     Text(
                       "إنشاء حساب",
-                      style: TextStyle(
+                      style: GoogleFonts.cairo(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
@@ -91,14 +98,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         Text(
                           "سياسة الخصوصية والشروط والأحكام",
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 12,
                             color: AppColors.yallow,
                           ),
                         ),
                         Text(
                           "الموافقة على",
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 12,
                             color: AppColors.naturalgray,
                           ),
@@ -129,18 +136,28 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       child: Text(
                         "إنشاء حساب ",
-                        style: TextStyle(color: AppColors.white, fontSize: 16),
+                        style: GoogleFonts.cairo(
+                          color: AppColors.white,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                    SizedBox(height: 80),
+                    SizedBox(height: 60),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(),
+                              ),
+                            );
+                          },
                           child: Text(
                             "تسجيل الدخول",
-                            style: TextStyle(
+                            style: GoogleFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: AppColors.lightblue,
@@ -149,7 +166,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         Text(
                           "لديك حساب مسبقاً؟",
-                          style: TextStyle(
+                          style: GoogleFonts.cairo(
                             fontSize: 16,
                             color: AppColors.naturalgray,
                           ),
