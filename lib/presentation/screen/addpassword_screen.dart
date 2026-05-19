@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
+import 'package:goods_delivery_app/datasource/model/register_model.dart';
+import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
+import 'package:goods_delivery_app/presentation/screen/Otp_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/addprofiledet_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -22,148 +28,193 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              SizedBox(height: 100),
-
-              Container(
-                width: double.infinity,
-
-                decoration: BoxDecoration(color: Colors.white),
+          child: Builder(
+            builder: (formContext) {
+              final signupCubit = formContext.read<SignUpCubit>();
+              return Form(
+                key: signupCubit.formkey2,
 
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-
                   children: [
-                    Text(
-                      "إدخال كلمة مرور ",
-                      style: GoogleFonts.cairo(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    SizedBox(height: 100),
 
-                    SizedBox(height: 10),
+                    Container(
+                      width: double.infinity,
 
-                    Text(
-                      "قم بإدخال كلمة مرور ",
-                      style: GoogleFonts.cairo(
-                        fontSize: 16,
-                        color: AppColors.naturalgray,
-                      ),
-                    ),
+                      decoration: BoxDecoration(color: Colors.white),
 
-                    SizedBox(height: 40),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
 
-                    // 🔹 كلمة المرور
-                    TextField(
-                      obscureText: isPasswordHidden,
-
-                      decoration: InputDecoration(
-                        labelText: "كلمة المرور",
-
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-
-                        prefixIcon: Icon(Icons.lock),
-
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            isPasswordHidden
-                                ? Icons.visibility_off
-                                : Icons.visibility,
+                        children: [
+                          Text(
+                            "إدخال كلمة مرور ",
+                            style: GoogleFonts.cairo(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
 
-                          onPressed: () {
-                            setState(() {
-                              isPasswordHidden = !isPasswordHidden;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
+                          SizedBox(height: 10),
 
-                    SizedBox(height: 20),
-
-                    // 🔹 تأكيد كلمة المرور
-                    TextField(
-                      obscureText: isConfirmPasswordHidden,
-
-                      decoration: InputDecoration(
-                        labelText: "تأكيد كلمة المرور",
-
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-
-                        prefixIcon: Icon(Icons.lock),
-
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            isConfirmPasswordHidden
-                                ? Icons.visibility_off
-                                : Icons.visibility,
+                          Text(
+                            "قم بإدخال كلمة مرور ",
+                            style: GoogleFonts.cairo(
+                              fontSize: 16,
+                              color: AppColors.naturalgray,
+                            ),
                           ),
 
-                          onPressed: () {
-                            setState(() {
-                              isConfirmPasswordHidden =
-                                  !isConfirmPasswordHidden;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "على الأقل 8 أحرف",
-                          style: GoogleFonts.cairo(
-                            fontSize: 12,
-                            color: AppColors.naturalgray,
+                          SizedBox(height: 40),
+
+                          // 🔹 كلمة المرور
+                          TextFormField(
+                            obscureText: isPasswordHidden,
+                            controller: signupCubit.passwordController,
+                            textDirection: TextDirection.rtl,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "يرجى إدخال كلمة المرور";
+                              }
+
+                              if (value.length < 8) {
+                                return "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+                              }
+
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              labelText: "كلمة المرور",
+
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+
+                              prefixIcon: Icon(Icons.lock),
+
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  isPasswordHidden
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+
+                                onPressed: () {
+                                  setState(() {
+                                    isPasswordHidden = !isPasswordHidden;
+                                  });
+                                },
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
 
-                    SizedBox(height: 60),
+                          SizedBox(height: 20),
 
-                    // 🔹 زر الحفظ
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddProfileScreen(),
+                          // 🔹 تأكيد كلمة المرور
+                          TextFormField(
+                            controller: signupCubit.passwordConController,
+                            textDirection: TextDirection.rtl,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "يرجى تأكيد كلمة المرور";
+                              }
+
+                              if (value !=
+                                  signupCubit.passwordController.text) {
+                                return "كلمتا المرور غير متطابقتين";
+                              }
+
+                              return null;
+                            },
+                            obscureText: isConfirmPasswordHidden,
+
+                            decoration: InputDecoration(
+                              labelText: "تأكيد كلمة المرور",
+
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+
+                              prefixIcon: Icon(Icons.lock),
+
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  isConfirmPasswordHidden
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                ),
+
+                                onPressed: () {
+                                  setState(() {
+                                    isConfirmPasswordHidden =
+                                        !isConfirmPasswordHidden;
+                                  });
+                                },
+                              ),
+                            ),
                           ),
-                        );
-                      },
+                          SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "على الأقل 8 أحرف",
+                                style: GoogleFonts.cairo(
+                                  fontSize: 12,
+                                  color: AppColors.naturalgray,
+                                ),
+                              ),
+                            ],
+                          ),
 
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, 50),
+                          SizedBox(height: 60),
 
-                        backgroundColor: AppColors.mainblue,
+                          // 🔹 زر الحفظ
+                          BlocBuilder<SignUpCubit, AuthState>(
+                            builder: (context, state) {
+                              return ElevatedButton(
+                                onPressed: () {
+                                  if (signupCubit.formkey2.currentState!
+                                      .validate()) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => BlocProvider.value(
+                                          value: context.read<SignUpCubit>(),
+                                          child: AddProfileScreen(),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
 
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize: Size(double.infinity, 50),
 
-                      child: Text(
-                        "التالي",
-                        style: GoogleFonts.cairo(
-                          color: AppColors.white,
-                          fontSize: 16,
-                        ),
+                                  backgroundColor: AppColors.mainblue,
+
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+
+                                child: Text(
+                                  "التالي",
+                                  style: GoogleFonts.cairo(
+                                    color: AppColors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

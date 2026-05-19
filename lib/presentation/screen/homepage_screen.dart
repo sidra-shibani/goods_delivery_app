@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 
@@ -57,163 +58,170 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 }
 
-// ================= HOME PAGE =================
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            // 🔹 القسم العلوي
-            Container(
-              height: MediaQuery.of(context).size.height * 0.33,
-              width: double.infinity,
+    return Scaffold(
+      drawer: const CustomDrawer(),
 
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height * 0.33,
+                width: double.infinity,
 
-                image: DecorationImage(
-                  image: AssetImage("assets/images/welcomepage.png"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
                   ),
 
-                  color: Colors.black.withOpacity(0.4),
+                  image: DecorationImage(
+                    image: AssetImage("assets/images/welcomepage.png"),
+                    fit: BoxFit.cover,
+                  ),
                 ),
 
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
 
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    color: Colors.black.withOpacity(0.4),
+                  ),
 
-                    children: [
-                      // 🔹 الأيقونات
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
 
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
 
-                            decoration: BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: BorderRadius.circular(12),
+                      children: [
+                        // 🔹 الأيقونات
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                          children: [
+                            // MENU BUTTON
+                            Builder(
+                              builder: (context) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Scaffold.of(context).openDrawer();
+                                  },
+
+                                  child: Container(
+                                    padding: const EdgeInsets.all(10),
+
+                                    decoration: BoxDecoration(
+                                      color: Colors.white24,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+
+                                    child: const Icon(
+                                      Icons.menu,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
+                            Container(
+                              padding: const EdgeInsets.all(10),
 
-                            child: const Icon(Icons.menu, color: Colors.white),
-                          ),
+                              decoration: BoxDecoration(
+                                color: Colors.white24,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
 
-                          Container(
-                            padding: const EdgeInsets.all(10),
-
-                            decoration: BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-
-                            child: const Icon(
-                              Icons.notifications_none,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const Spacer(),
-
-                      Text(
-                        "مرحباً بك",
-
-                        style: GoogleFonts.cairo(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
-
-                      const SizedBox(height: 5),
-
-                      Text(
-                        "جاهزون لشحن بضائعك",
-
-                        style: GoogleFonts.cairo(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-
-                          shadows: [
-                            Shadow(
-                              color: Colors.black54,
-                              blurRadius: 10,
-                              offset: Offset(0, 3),
+                              child: const Icon(
+                                Icons.notifications_none,
+                                color: Colors.white,
+                              ),
                             ),
                           ],
                         ),
-                      ),
 
-                      const SizedBox(height: 10),
+                        const Spacer(),
 
-                      Text(
-                        "خدمة شحن سريعة وآمنة",
-
-                        style: GoogleFonts.cairo(
-                          color: Colors.white70,
-                          fontSize: 16,
+                        Text(
+                          "مرحباً بك",
+                          style: GoogleFonts.cairo(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(height: 5),
+
+                        Text(
+                          "جاهزون لشحن بضائعك",
+
+                          style: GoogleFonts.cairo(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 10),
+
+                        Text(
+                          "خدمة شحن سريعة وآمنة",
+
+                          style: GoogleFonts.cairo(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 25),
+              const SizedBox(height: 25),
 
-            // 🔹 بطاقات الخدمات
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              // باقي الصفحة ...
 
-              child: Column(
-                children: [
-                  _buildCard(
-                    icon: Icons.local_shipping,
-                    title: "إنشاء طلب شحن",
-                    subtitle: "ابدأ بإرسال بضائعك بسهولة",
-                  ),
+              // 🔹 بطاقات الخدمات
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                  const SizedBox(height: 15),
+                child: Column(
+                  children: [
+                    _buildCard(
+                      icon: Icons.local_shipping,
+                      title: "إنشاء طلب شحن",
+                      subtitle: "ابدأ بإرسال بضائعك بسهولة",
+                    ),
 
-                  _buildCard(
-                    icon: Icons.location_on,
-                    title: "تتبع الشحنة",
-                    subtitle: "تابع حالة الشحنة لحظة بلحظة",
-                  ),
+                    const SizedBox(height: 15),
 
-                  const SizedBox(height: 15),
+                    _buildCard(
+                      icon: Icons.location_on,
+                      title: "تتبع الشحنة",
+                      subtitle: "تابع حالة الشحنة لحظة بلحظة",
+                    ),
 
-                  _buildCard(
-                    icon: Icons.history,
-                    title: "السجل السابق",
-                    subtitle: "استعرض الطلبات السابقة",
-                  ),
-                ],
+                    const SizedBox(height: 15),
+
+                    _buildCard(
+                      icon: Icons.history,
+                      title: "السجل السابق",
+                      subtitle: "استعرض الطلبات السابقة",
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

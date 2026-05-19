@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
+import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
+import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
+import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/resetpassword_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/signUp_Screen.dart';
+import 'package:goods_delivery_app/presentation/screen/signupFlow.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,175 +19,331 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  @override
   bool isPasswordHidden = true;
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.3,
-              width: double.infinity,
-              child: Image.asset(
-                "assets/images/secondpage.png",
-                fit: BoxFit.cover,
-              ),
-            ),
+    return BlocProvider(
+      create: (context) => LoginCubit(context.read<AuthRepository>()),
 
-            Expanded(
-              child: Transform.translate(
-                offset: Offset(0, -30),
-                child: Container(
-                  width: double.infinity,
+      child: BlocListener<LoginCubit, AuthState>(
+        listener: (context, state) async {
+          if (state is AuthLoadedLogin) {
+            final token = state.response.data.accessToken;
+            final username = state.response.data.username;
 
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
+            await SharedPreferencesHelper.saveToken(token);
+
+            if (username != null) {
+              await SharedPreferencesHelper.saveName(username);
+            }
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => MainHomeScreen()),
+            );
+          }
+
+          if (state is AuthError) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
+          }
+        },
+
+        child: Scaffold(
+          backgroundColor: AppColors.white,
+          resizeToAvoidBottomInset: false,
+
+          body: SafeArea(
+            child: Builder(
+              builder: (formContext) {
+                final cubit = formContext.read<LoginCubit>();
+
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: double.infinity,
+                      child: Image.asset(
+                        "assets/images/secondpage.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        SizedBox(height: 20),
+                    Expanded(
+                      child: Transform.translate(
+                        offset: Offset(0, -30),
 
-                        Text(
-                          "مرحباً",
-                          style: GoogleFonts.cairo(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "يرجى إدخال بياناتك قبل الدخول",
-                          style: GoogleFonts.cairo(
-                            fontSize: 16,
-                            color: AppColors.naturalgray,
-                          ),
-                        ),
+                        child: Container(
+                          width: double.infinity,
 
-                        SizedBox(height: 30),
-
-                        // رقم الهاتف
-                        TextField(
-                          textDirection: TextDirection.rtl,
-                          decoration: InputDecoration(
-                            labelText: "رقم الهاتف",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            prefixIcon: Icon(Icons.phone),
-                          ),
-                        ),
-
-                        SizedBox(height: 20),
-
-                        // كلمة المرور
-                        TextField(
-                          obscureText: isPasswordHidden,
-
-                          decoration: InputDecoration(
-                            labelText: "كلمة المرور",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            prefixIcon: Icon(Icons.lock),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                isPasswordHidden
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  isPasswordHidden = !isPasswordHidden;
-                                });
-                              },
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(40),
+                              topRight: Radius.circular(40),
                             ),
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ResetPasswordScreen(),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            "نسيت كلمة المرور؟",
-                            style: GoogleFonts.cairo(
-                              fontSize: 16,
-                              color: AppColors.mainblue,
-                            ),
-                          ),
-                        ),
 
-                        SizedBox(height: 30),
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
 
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity, 50),
-                            backgroundColor: AppColors.mainblue,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                          ),
-                          child: Text(
-                            "تسجيل الدخول",
-                            style: GoogleFonts.cairo(
-                              color: AppColors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignupScreen(),
+                            child: Form(
+                              key: cubit.formkey,
+
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+
+                                children: [
+                                  SizedBox(height: 20),
+
+                                  Text(
+                                    "مرحباً",
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                );
-                              },
-                              child: Text(
-                                "سجل هنا",
-                                style: GoogleFonts.cairo(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.mainblue,
-                                ),
+
+                                  Text(
+                                    "يرجى إدخال بياناتك قبل الدخول",
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 16,
+                                      color: AppColors.naturalgray,
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 30),
+
+                                  // رقم الهاتف
+                                  TextFormField(
+                                    controller: cubit.phoneController,
+                                    textDirection: TextDirection.ltr,
+                                    keyboardType: TextInputType.phone,
+
+                                    validator: (value) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
+                                        return "يرجى إدخال رقم الهاتف";
+                                      }
+
+                                      if (value.length < 9) {
+                                        return "رقم الهاتف غير صالح";
+                                      }
+
+                                      return null;
+                                    },
+
+                                    decoration: InputDecoration(
+                                      labelText: "رقم الهاتف",
+
+                                      hintText: "9XXXXXXXX",
+
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+
+                                      prefixIcon: const Icon(Icons.phone),
+
+                                      prefixText: "+963 ",
+                                      prefixStyle: GoogleFonts.cairo(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 20),
+
+                                  // كلمة المرور
+                                  TextFormField(
+                                    controller: cubit.passwordController,
+
+                                    obscureText: isPasswordHidden,
+
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return "يرجى إدخال كلمة المرور";
+                                      }
+                                      return null;
+                                    },
+
+                                    decoration: InputDecoration(
+                                      labelText: "كلمة المرور",
+
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+
+                                      prefixIcon: Icon(Icons.lock),
+
+                                      suffixIcon: IconButton(
+                                        icon: Icon(
+                                          isPasswordHidden
+                                              ? Icons.visibility_off
+                                              : Icons.visibility,
+                                        ),
+
+                                        onPressed: () {
+                                          setState(() {
+                                            isPasswordHidden =
+                                                !isPasswordHidden;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pushReplacement(
+                                        context,
+
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ResetPasswordScreen(),
+                                        ),
+                                      );
+                                    },
+
+                                    child: Text(
+                                      "نسيت كلمة المرور؟",
+
+                                      style: GoogleFonts.cairo(
+                                        fontSize: 16,
+                                        color: AppColors.mainblue,
+                                      ),
+                                    ),
+                                  ),
+
+                                  SizedBox(height: 30),
+
+                                  BlocBuilder<LoginCubit, AuthState>(
+                                    builder: (context, state) {
+                                      if (state is AuthLoading) {
+                                        return ElevatedButton(
+                                          onPressed: null,
+
+                                          style: ElevatedButton.styleFrom(
+                                            minimumSize: Size(
+                                              double.infinity,
+                                              50,
+                                            ),
+
+                                            backgroundColor: AppColors.mainblue,
+
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                          ),
+
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                      }
+
+                                      return ElevatedButton(
+                                        onPressed: () {
+                                          if (cubit.formkey.currentState!
+                                              .validate()) {
+                                            cubit.login(
+                                              "+963${cubit.phoneController.text.trim().substring(1)}",
+
+                                              cubit.passwordController.text
+                                                  .trim(),
+                                            );
+                                          }
+                                        },
+
+                                        style: ElevatedButton.styleFrom(
+                                          minimumSize: Size(
+                                            double.infinity,
+                                            50,
+                                          ),
+
+                                          backgroundColor: AppColors.mainblue,
+
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              15,
+                                            ),
+                                          ),
+                                        ),
+
+                                        child: Text(
+                                          "تسجيل الدخول",
+
+                                          style: GoogleFonts.cairo(
+                                            color: AppColors.white,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+
+                                  SizedBox(height: 10),
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => BlocProvider(
+                                                create: (context) =>
+                                                    SignUpCubit(
+                                                      context
+                                                          .read<
+                                                            AuthRepository
+                                                          >(),
+                                                    ),
+                                                child: SignupFlow(),
+                                              ),
+                                            ),
+                                          );
+                                        },
+
+                                        child: Text(
+                                          "سجل هنا",
+
+                                          style: GoogleFonts.cairo(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+
+                                            color: AppColors.mainblue,
+                                          ),
+                                        ),
+                                      ),
+
+                                      Text(
+                                        "ليس لديك حساب؟",
+
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 16,
+
+                                          color: AppColors.naturalgray,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                            Text(
-                              "ليس لديك حساب؟",
-                              style: GoogleFonts.cairo(
-                                fontSize: 16,
-                                color: AppColors.naturalgray,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
+                  ],
+                );
+              },
             ),
-          ],
+          ),
         ),
       ),
     );
