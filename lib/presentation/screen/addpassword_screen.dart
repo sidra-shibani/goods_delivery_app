@@ -3,9 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
-import 'package:goods_delivery_app/datasource/model/register_model.dart';
-import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
-import 'package:goods_delivery_app/presentation/screen/Otp_screen.dart';
+
 import 'package:goods_delivery_app/presentation/screen/addprofiledet_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 

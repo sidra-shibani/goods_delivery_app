@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
+import 'package:goods_delivery_app/presentation/widget/shipmentBottomSheet_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 
@@ -196,10 +197,20 @@ class HomePage extends StatelessWidget {
 
                 child: Column(
                   children: [
-                    _buildCard(
-                      icon: Icons.local_shipping,
-                      title: "إنشاء طلب شحن",
-                      subtitle: "ابدأ بإرسال بضائعك بسهولة",
+                    GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => const CreateShipmentBottomSheet(),
+                        );
+                      },
+                      child: _buildCard(
+                        icon: Icons.local_shipping,
+                        title: "إنشاء طلب شحن",
+                        subtitle: "ابدأ بإرسال بضائعك بسهولة",
+                      ),
                     ),
 
                     const SizedBox(height: 15),
