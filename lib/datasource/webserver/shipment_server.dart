@@ -63,4 +63,8 @@ class ShipmentServer {
   Future<Response> createShipment(ShipmentRequest model) {
     return dio.post('/merchant/shipments', data: model.toJson());
   }
+
+  Future<Response> getMyshipments() {
+    return dio.get('/merchant/shipments');
+  }
 }

@@ -1,7 +1,7 @@
 class ShipmentResponse {
   final String status;
   final String message;
-  final ShipmentData data;
+  final ShipmentListData data;
 
   ShipmentResponse({
     required this.status,
@@ -13,12 +13,8 @@ class ShipmentResponse {
     return ShipmentResponse(
       status: json['status'] ?? '',
       message: json['message'] ?? '',
-      data: ShipmentData.fromJson(json['data'] ?? {}),
+      data: ShipmentListData.fromJson(json['data'] ?? {}),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {"status": status, "message": message, "data": data.toJson()};
   }
 }
 
@@ -377,5 +373,21 @@ class CheckpointRequest {
       "street": street,
       "building_number": buildingNumber,
     };
+  }
+}
+
+class ShipmentListData {
+  final List<ShipmentData> shipments;
+
+  ShipmentListData({required this.shipments});
+
+  factory ShipmentListData.fromJson(Map<String, dynamic> json) {
+    return ShipmentListData(
+      shipments:
+          (json['shipments'] as List?)
+              ?.map((e) => ShipmentData.fromJson(e))
+              .toList() ??
+          [],
+    );
   }
 }

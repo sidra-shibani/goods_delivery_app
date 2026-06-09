@@ -10,6 +10,7 @@ class AppColors {
   static const yallow = Color(0xffEDAE10);
   static const lightyallow = Color(0xffFFFBE7);
   static const orange = Color(0xffF36621);
+  static const lightorange = Color(0xffFFD9C5);
   static const white = Color(0xffFFFFFF);
   static const black = Color(0xff000000);
 }

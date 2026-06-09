@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/getShip_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
+import 'package:goods_delivery_app/presentation/widget/OrderDetailsBottomSheet.dart';
 import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
+import 'package:goods_delivery_app/presentation/widget/orderCard_widget.dart';
 import 'package:goods_delivery_app/presentation/widget/shipmentBottomSheet_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goods_delivery_app/const/colors.dart';
@@ -66,13 +72,13 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const CustomDrawer(),
-
+      backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
+        child: SizedBox.expand(
+          child: Stack(
             children: [
               Container(
-                height: MediaQuery.of(context).size.height * 0.33,
+                height: 200,
                 width: double.infinity,
 
                 decoration: const BoxDecoration(
@@ -82,7 +88,7 @@ class HomePage extends StatelessWidget {
                   ),
 
                   image: DecorationImage(
-                    image: AssetImage("assets/images/welcomepage.png"),
+                    image: AssetImage("assets/images/road2.png"),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -149,36 +155,22 @@ class HomePage extends StatelessWidget {
                           ],
                         ),
 
-                        const Spacer(),
-
                         Text(
-                          "مرحباً بك",
+                          " اهلاً بعودتك",
                           style: GoogleFonts.cairo(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-
-                        const SizedBox(height: 5),
-
-                        Text(
-                          "جاهزون لشحن بضائعك",
-
-                          style: GoogleFonts.cairo(
-                            color: Colors.white,
-                            fontSize: 30,
+                            color: AppColors.white,
                             fontWeight: FontWeight.bold,
+                            fontSize: 30,
                           ),
                         ),
-
                         const SizedBox(height: 10),
 
                         Text(
-                          "خدمة شحن سريعة وآمنة",
+                          "الوسيلة الأكثر اماناً لنقل بضائعك",
 
                           style: GoogleFonts.cairo(
-                            color: Colors.white70,
-                            fontSize: 16,
+                            color: AppColors.white,
+                            fontSize: 18,
                           ),
                         ),
                       ],
@@ -187,48 +179,102 @@ class HomePage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 25),
+              Positioned(
+                top: 160, // يجعل الأبيض يغطي جزء بسيط من الصورة
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
 
-              // باقي الصفحة ...
-
-              // 🔹 بطاقات الخدمات
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => const CreateShipmentBottomSheet(),
-                        );
-                      },
-                      child: _buildCard(
-                        icon: Icons.local_shipping,
-                        title: "إنشاء طلب شحن",
-                        subtitle: "ابدأ بإرسال بضائعك بسهولة",
-                      ),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
                     ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
 
-                    const SizedBox(height: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const SizedBox(height: 15),
 
-                    _buildCard(
-                      icon: Icons.location_on,
-                      title: "تتبع الشحنة",
-                      subtitle: "تابع حالة الشحنة لحظة بلحظة",
+                        GestureDetector(
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (_) => const CreateShipmentBottomSheet(),
+                            );
+                          },
+                          child: _buildCard(
+                            icon: Icons.local_shipping,
+                            title: "إنشاء طلب شحن",
+                            subtitle: "ابدأ بإرسال بضائعك بسهولة",
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Text(
+                          "طلباتي الجارية",
+
+                          style: GoogleFonts.cairo(
+                            color: AppColors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+
+                        //const SizedBox(height: 15),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(0),
+                            child: BlocBuilder<GetShipCubit, ShipmentState>(
+                              builder: (context, state) {
+                                if (state is GetShipLoaded) {
+                                  final shipments =
+                                      state.shipment.data.shipments;
+                                  return ListView.builder(
+                                    itemCount: shipments.length,
+                                    itemBuilder: (context, index) {
+                                      final shipment = shipments[index];
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 8,
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              builder: (_) =>
+                                                  OrderDetailsBottomSheet(
+                                                    shipment: shipment,
+                                                  ),
+                                            );
+                                          },
+                                          child: OrderCard(shipment: shipment),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 15),
-
-                    _buildCard(
-                      icon: Icons.history,
-                      title: "السجل السابق",
-                      subtitle: "استعرض الطلبات السابقة",
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
@@ -315,18 +361,88 @@ class OrdersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: Text(
-          "طلباتي",
+    return Scaffold(
+      backgroundColor: const Color(0xffF8F8F8),
 
-          style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.menu, color: Color(0xff4A5D8F)),
+                  ),
+
+                  const Spacer(),
+
+                  Text(
+                    "طلباتي",
+                    style: GoogleFonts.cairo(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black,
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.notifications,
+                      color: Color(0xff4A5D8F),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: BlocBuilder<GetShipCubit, ShipmentState>(
+                builder: (context, state) {
+                  if (state is GetShipLoaded) {
+                    final shipments = state.shipment.data.shipments;
+                    return ListView.builder(
+                      itemCount: shipments.length,
+                      itemBuilder: (context, index) {
+                        final shipment = shipments[index];
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 16,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (_) =>
+                                    OrderDetailsBottomSheet(shipment: shipment),
+                              );
+                            },
+                            child: OrderCard(shipment: shipment),
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
 // ================= PROFILE PAGE =================
 
 class ProfilePage extends StatelessWidget {

@@ -16,3 +16,9 @@ class createShipLoaded extends ShipmentState {
 
   createShipLoaded(this.response);
 }
+
+class GetShipLoaded extends ShipmentState {
+  final ShipmentResponse shipment;
+
+  GetShipLoaded(this.shipment);
+}

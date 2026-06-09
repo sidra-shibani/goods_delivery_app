@@ -42,4 +42,35 @@ class ShipmentRepo {
       return Left(ApiError(message: 'Unexpected error: $e'));
     }
   }
+
+  Future<Either<ApiError, ShipmentResponse>> getship() async {
+    try {
+      final response = await service.getMyshipments();
+
+      return Right(ShipmentResponse.fromJson(response.data));
+    } on DioException catch (dioErr) {
+      final message =
+          dioErr.response?.data['message'] ??
+          dioErr.message ??
+          'Dio network error';
+
+      return Left(
+        ApiError(
+          statusCode: dioErr.response?.statusCode ?? 0,
+          message: message,
+          responseBody: dioErr.response?.data.toString() ?? '',
+        ),
+      );
+    } on SocketException {
+      return Left(
+        ApiError(
+          statusCode: 0,
+          message: 'No Internet connection',
+          responseBody: '',
+        ),
+      );
+    } catch (e) {
+      return Left(ApiError(message: 'Unexpected error: $e'));
+    }
+  }
 }
