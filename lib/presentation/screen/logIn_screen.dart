@@ -176,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(
-                                            15,
+                                            10,
                                           ),
                                         ),
 
@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             if (cubit.formkey.currentState!
                                                 .validate()) {
                                               cubit.login(
-                                                "+963${cubit.phoneController.text.trim().substring(1)}",
+                                                "+963${cubit.phoneController.text.trim()}",
 
                                                 cubit.passwordController.text
                                                     .trim(),
@@ -296,6 +296,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                           MainAxisAlignment.center,
 
                                       children: [
+                                        Text(
+                                          "ليس لديك حساب؟",
+
+                                          style: GoogleFonts.cairo(
+                                            fontSize: 16,
+
+                                            color: AppColors.naturalgray,
+                                          ),
+                                        ),
+
                                         TextButton(
                                           onPressed: () {
                                             Navigator.push(
@@ -324,16 +334,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                               color: AppColors.mainblue,
                                             ),
-                                          ),
-                                        ),
-
-                                        Text(
-                                          "ليس لديك حساب؟",
-
-                                          style: GoogleFonts.cairo(
-                                            fontSize: 16,
-
-                                            color: AppColors.naturalgray,
                                           ),
                                         ),
                                       ],

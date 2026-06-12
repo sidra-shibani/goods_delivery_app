@@ -4,12 +4,14 @@ class TruckData {
   static List<TruckSizeModel> closedTruck = [
     const TruckSizeModel(
       name: "شاحنة صغيرة",
+      capacityKg: 500,
       description: "تتحمل حتى 500 كغ وحجم الصندوق 160 سم",
       price: "50,000",
       image: "assets/images/truck1_small.png",
     ),
 
     const TruckSizeModel(
+      capacityKg: 2000,
       name: "شاحنة متوسطة",
       description: "تتحمل حتى 2 طن وحجم الصندوق 3 متر",
       price: "100,000",
@@ -17,6 +19,7 @@ class TruckData {
     ),
 
     const TruckSizeModel(
+      capacityKg: 5000,
       name: "شاحنة كبيرة",
       description: "تتحمل حتى 5 طن وحجم الصندوق 6 متر",
       price: "200,000",
@@ -26,6 +29,7 @@ class TruckData {
 
   static List<TruckSizeModel> openTruck = [
     const TruckSizeModel(
+      capacityKg: 500,
       name: "شاحنة صغيرة",
       description: "تتحمل حتى 500 كغ وحجم الصندوق 160 سم",
       price: "50,000",
@@ -33,6 +37,7 @@ class TruckData {
     ),
 
     const TruckSizeModel(
+      capacityKg: 2000,
       name: "شاحنة متوسطة",
       description: "تتحمل حتى 2 طن وحجم الصندوق 3 متر",
       price: "100,000",
@@ -40,6 +45,7 @@ class TruckData {
     ),
 
     const TruckSizeModel(
+      capacityKg: 5000,
       name: "شاحنة كبيرة",
       description: "تتحمل حتى 5 طن وحجم الصندوق 6 متر",
       price: "200,000",
@@ -49,6 +55,7 @@ class TruckData {
 
   static List<TruckSizeModel> refrigeratedTruck = [
     const TruckSizeModel(
+      capacityKg: 500,
       name: "شاحنة صغيرة",
       description: "تتحمل حتى 500 كغ وحجم الصندوق 160 سم",
       price: "50,000",
@@ -56,6 +63,7 @@ class TruckData {
     ),
 
     const TruckSizeModel(
+      capacityKg: 2000,
       name: "شاحنة متوسطة",
       description: "تتحمل حتى 2 طن وحجم الصندوق 3 متر",
       price: "100,000",
@@ -63,6 +71,7 @@ class TruckData {
     ),
 
     const TruckSizeModel(
+      capacityKg: 5000,
       name: "شاحنة كبيرة",
       description: "تتحمل حتى 5 طن وحجم الصندوق 6 متر",
       price: "200,000",

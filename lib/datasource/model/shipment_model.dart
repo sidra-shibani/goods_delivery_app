@@ -26,7 +26,7 @@ class ShipmentData {
   final double weight;
   final bool nightShipping;
   final String whoPays;
-  final int price;
+  final double price;
   final String additionalDetails;
   final String status;
 
@@ -34,7 +34,7 @@ class ShipmentData {
   final String? pickedUpAt;
   final String? deliveredAt;
 
-  final List<String> mediaUrls;
+  final List<String>? mediaUrls;
 
   final Merchant merchant;
   final Driver? driver;
@@ -72,7 +72,7 @@ class ShipmentData {
       weight: (json['weight'] ?? 0).toDouble(),
       nightShipping: json['night_shipping'] ?? false,
       whoPays: json['who_pays'] ?? '',
-      price: json['price'] ?? 0,
+      price: (json['price'] ?? 0).toDouble(),
       additionalDetails: json['additional_details'] ?? '',
       status: json['status'] ?? '',
       pickupAt: json['pickup_at'] ?? '',
@@ -269,7 +269,7 @@ class ShipmentRequest {
   final String goodsType;
   final double weight;
   final String vehicleType;
-  final int vehicleCapacityKg;
+  final String vehicleCapacityKg;
   final String whoPays;
   final String scheduledPickupAt;
   final String additionalDetails;

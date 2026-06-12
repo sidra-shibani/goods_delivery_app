@@ -64,25 +64,22 @@ class OrderCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 45,
-                          vertical: 10,
+                          horizontal: 13,
+                          vertical: 7,
                         ),
-
                         decoration: BoxDecoration(
-                          color: AppColors.lightorange,
+                          color: getStatusBackgroundColor(shipment.status),
                           borderRadius: BorderRadius.circular(25),
                         ),
-
                         child: Text(
-                          shipment.status,
+                          getStatusText(shipment.status),
                           style: GoogleFonts.cairo(
-                            color: AppColors.orange,
+                            color: getStatusTextColor(shipment.status),
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                       ),
-
                       const Spacer(),
 
                       Column(
@@ -152,5 +149,104 @@ class OrderCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String getStatusText(String status) {
+  switch (status) {
+    case "created":
+      return "قيد الإنشاء";
+
+    case "pending":
+      return "بانتظار الموافقة";
+
+    case "accepted":
+      return "تم القبول";
+
+    case "assigned":
+      return "تم تعيين سائق";
+
+    case "picked_up":
+      return "تم الاستلام";
+
+    case "in_transit":
+      return "قيد النقل";
+
+    case "delivered":
+      return "تم التسليم";
+
+    case "cancelled":
+      return "ملغي";
+    case "expired":
+      return "منتهي الصلاحية";
+    case "on_way_to_pickup":
+      return "في الطريق للاستلام";
+
+    default:
+      return status;
+  }
+}
+
+Color getStatusBackgroundColor(String status) {
+  switch (status) {
+    case "created":
+      return AppColors.lightblue;
+
+    case "pending":
+      return Colors.orange.shade100;
+
+    case "accepted":
+      return Colors.green.shade100;
+
+    case "assigned":
+      return Colors.purple.shade100;
+
+    case "picked_up":
+      return Colors.teal.shade100;
+
+    case "in_transit":
+      return Colors.indigo.shade100;
+
+    case "delivered":
+      return Colors.green.shade200;
+
+    case "cancelled":
+      return Colors.red.shade100;
+    case "expired":
+      return Colors.red.shade100;
+    default:
+      return Colors.grey.shade200;
+  }
+}
+
+Color getStatusTextColor(String status) {
+  switch (status) {
+    case "created":
+      return Colors.blue;
+
+    case "pending":
+      return Colors.orange;
+
+    case "accepted":
+      return Colors.green;
+
+    case "assigned":
+      return Colors.purple;
+
+    case "picked_up":
+      return Colors.teal;
+
+    case "in_transit":
+      return Colors.indigo;
+
+    case "delivered":
+      return Colors.green.shade800;
+
+    case "cancelled":
+      return Colors.red;
+    case "expired":
+      return Colors.red;
+    default:
+      return Colors.grey;
   }
 }

@@ -38,6 +38,7 @@ class _TruckSizeScreenState extends State<TruckSizeScreen> {
   @override
   Widget build(BuildContext context) {
     final createshipCubit = context.read<CreateShipCubit>();
+
     return Scaffold(
       backgroundColor: AppColors.white,
 
@@ -95,7 +96,9 @@ class _TruckSizeScreenState extends State<TruckSizeScreen> {
                         selectedSize = size;
                       });
 
-                      createshipCubit.trucksizeController.text = size.name;
+                      createshipCubit.trucksizeController.text = size.capacityKg
+                          .toString();
+                      createshipCubit.trucksizeNameController.text = size.name;
                     },
 
                     child: Container(

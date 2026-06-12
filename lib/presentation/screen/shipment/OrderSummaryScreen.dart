@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../const/colors.dart';
 
@@ -10,7 +12,7 @@ class OrderSummaryScreen extends StatelessWidget {
     const double basePrice = 200000;
     const double nightShipping = 25000;
     const double extraFees = 10000;
-
+    final createShipCubit = context.read<CreateShipCubit>();
     final double totalPrice = basePrice + nightShipping + extraFees;
 
     return Scaffold(
@@ -67,7 +69,7 @@ class OrderSummaryScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(right: 30),
                       child: Text(
-                        "دمشق - المزة - أوتستراد المزة",
+                        createShipCubit.pickupaddressController.text,
                         textAlign: TextAlign.right,
 
                         style: GoogleFonts.cairo(
@@ -102,7 +104,7 @@ class OrderSummaryScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(right: 30),
                       child: Text(
-                        "حلب - الحمدانية",
+                        createShipCubit.deliveryaddressController.text,
                         textAlign: TextAlign.right,
 
                         style: GoogleFonts.cairo(
@@ -162,7 +164,8 @@ class OrderSummaryScreen extends StatelessWidget {
                           Column(
                             children: [
                               Text(
-                                "شاحنة متوسطة ",
+                                createShipCubit.trucksizeNameController.text,
+
                                 style: GoogleFonts.cairo(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -170,7 +173,20 @@ class OrderSummaryScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 15),
                               Text(
-                                " براد",
+                                createShipCubit.truckTypeController.text ==
+                                        "closed"
+                                    ? "مغلقة"
+                                    : createShipCubit
+                                              .truckTypeController
+                                              .text ==
+                                          "open"
+                                    ? "مفتوحة"
+                                    : createShipCubit
+                                              .truckTypeController
+                                              .text ==
+                                          "refrigerated"
+                                    ? "براد"
+                                    : createShipCubit.truckTypeController.text,
                                 style: GoogleFonts.cairo(fontSize: 14),
                               ),
                             ],
@@ -180,7 +196,31 @@ class OrderSummaryScreen extends StatelessWidget {
                     ),
 
                     const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          createShipCubit.whoPays == "sender"
+                              ? "المرسل"
+                              : createShipCubit.whoPays == "receiver"
+                              ? "المستلم"
+                              : createShipCubit.whoPays,
+                          style: GoogleFonts.cairo(
+                            color: Colors.grey.shade700,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          "الدافع",
+                          style: GoogleFonts.cairo(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
 
+                    const SizedBox(height: 20),
                     Text(
                       "تفاصيل إضافية",
                       style: GoogleFonts.cairo(

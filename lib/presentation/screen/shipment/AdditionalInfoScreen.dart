@@ -27,7 +27,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
   int piecesCount = 1;
   int piecesweight = 1;
-  String payer = "المرسل";
+  String payer = "sender";
 
   final TextEditingController notesController = TextEditingController();
 
@@ -329,7 +329,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                         style: GoogleFonts.cairo(),
                                       ),
 
-                                      value: "المرسل",
+                                      value: "sender",
                                       groupValue: payer,
 
                                       activeColor: AppColors.yallow,
@@ -348,7 +348,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                         style: GoogleFonts.cairo(),
                                       ),
 
-                                      value: "المستلم",
+                                      value: "receiver",
                                       groupValue: payer,
 
                                       activeColor: AppColors.yallow,
@@ -503,12 +503,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                       createShipCubit.truckTypeController.text,
 
                                   vehicleCapacityKg:
-                                      int.tryParse(
-                                        createShipCubit
-                                            .trucksizeController
-                                            .text,
-                                      ) ??
-                                      0,
+                                      createShipCubit.trucksizeController.text,
 
                                   whoPays: createShipCubit.whoPays,
 
@@ -521,7 +516,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                   media: [],
 
                                   route: RouteRequest(
-                                    overviewPolyline: "",
+                                    overviewPolyline: "abcd1234encodedpolyline",
 
                                     pickUpLat: createShipCubit
                                         .pickuplatController
@@ -537,8 +532,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                         .deliverylngController
                                         .text,
 
-                                    distance: 0,
-                                    durationMinutes: 0,
+                                    distance: 75,
+                                    durationMinutes: 90,
 
                                     pickUpCheckpointDetails: CheckpointRequest(
                                       supervisorName: createShipCubit

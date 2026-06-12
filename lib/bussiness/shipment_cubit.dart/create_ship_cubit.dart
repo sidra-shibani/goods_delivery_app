@@ -43,10 +43,11 @@ class CreateShipCubit extends Cubit<ShipmentState> {
 
   final goodsTypeController = TextEditingController();
   final weightController = TextEditingController();
-  String whoPays = "المرسل";
+  String whoPays = "sender";
+  String overviewPolyline = "";
   final piecesCountController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
-
+  TextEditingController trucksizeNameController = TextEditingController();
   CreateShipCubit(this.repository) : super(ShipInitial());
 
   Future<void> createShip(ShipmentRequest request) async {

@@ -6,6 +6,7 @@ import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/model/register_model.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 import 'package:goods_delivery_app/presentation/screen/Otp_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
@@ -61,7 +62,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
           final signupCubit = context.read<SignUpCubit>();
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => OtpScreen()),
+            MaterialPageRoute(builder: (_) => LoginScreen()),
           );
         } else if (state is AuthError) {
           ScaffoldMessenger.of(
@@ -306,7 +307,7 @@ class _AddProfileScreenState extends State<AddProfileScreen> {
                                         email: signupCubit.emailController.text
                                             .trim(),
                                         phoneNumber:
-                                            "+963${signupCubit.phoneController.text.trim().substring(1)}",
+                                            "+963${signupCubit.phoneController.text.trim()}",
                                         password: signupCubit
                                             .passwordController
                                             .text

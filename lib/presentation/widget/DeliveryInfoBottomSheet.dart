@@ -13,6 +13,12 @@ class DeliveryInfoBottomSheet extends StatefulWidget {
 }
 
 class _DeliveryInfoBottomSheetState extends State<DeliveryInfoBottomSheet> {
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -179,6 +185,15 @@ class _DeliveryInfoBottomSheetState extends State<DeliveryInfoBottomSheet> {
                         print(
                           " ${createshipCubit.deliveryphoneController.text}",
                         );
+                        final cubit = context.read<CreateShipCubit>();
+                        if (cubit.deliverynameController.text.isEmpty ||
+                            cubit.deliveryphoneController.text.isEmpty ||
+                            cubit.deliveryaddressController.text.isEmpty ||
+                            cubit.deliverystreetController.text.isEmpty ||
+                            cubit.deliverybuildingController.text.isEmpty) {
+                          _showError("يرجى إدخال تفاصيل عنوان المستلم");
+                          return;
+                        }
                         Navigator.pop(context);
                       },
 

@@ -18,6 +18,16 @@ class CreateShipmentBottomSheet extends StatefulWidget {
 
 class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
   DateTime? selectedDate;
+  bool pickupLocationSelected = false;
+  bool deliveryLocationSelected = false;
+
+  bool pickupDetailsSelected = false;
+  bool deliveryDetailsSelected = false;
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,8 +130,9 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                           pickedTime.hour,
                           pickedTime.minute,
                         );
+                        final utcDateTime = dateTime.toUtc();
 
-                        createshipCubit.scheduleController.text = dateTime
+                        createshipCubit.scheduleController.text = utcDateTime
                             .toIso8601String();
 
                         setState(() {
@@ -132,6 +143,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                       child: _customField(
                         icon: Icons.access_time,
                         iconColor: AppColors.mainblue,
+                        //selected: selectedDate != null,
                         text: selectedDate == null
                             ? "حدد موعد التحميل"
                             : "${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"
@@ -160,6 +172,9 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                               .longitude
                               .toString();
 
+                          setState(() {
+                            pickupLocationSelected = true;
+                          });
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("تم حفظ موقع التحميل"),
@@ -171,25 +186,35 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                       child: _customField(
                         icon: Icons.location_on,
                         iconColor: Colors.red,
-                        text: "حدد عنوان التحميل على الخريطة",
+                        selected: pickupLocationSelected,
+                        text: pickupLocationSelected
+                            ? "تم اختيار موقع المرسل"
+                            : "حدد عنوان التحميل على الخريطة",
                       ),
                     ),
                     const SizedBox(height: 12),
 
                     GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
+                      onTap: () async {
+                        await showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
                           builder: (_) => const PickupInfoBottomSheet(),
                         );
+
+                        setState(() {
+                          pickupDetailsSelected = true;
+                        });
                       },
 
                       child: _customField(
                         icon: Icons.gps_fixed,
                         iconColor: Colors.grey,
-                        text: "تفاصيل عنوان التحميل",
+                        selected: pickupDetailsSelected,
+                        text: pickupDetailsSelected
+                            ? "تم إدخال بيانات المرسل"
+                            : "تفاصيل عنوان التحميل",
                       ),
                     ),
 
@@ -217,6 +242,10 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                               .longitude
                               .toString();
 
+                          setState(() {
+                            deliveryLocationSelected = true;
+                          });
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("تم حفظ موقع الاستلام"),
@@ -228,26 +257,35 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                       child: _customField(
                         icon: Icons.location_on,
                         iconColor: const Color(0xffF4B400),
-                        text: "حدد عنوان الاستلام على الخريطة",
+                        selected: deliveryLocationSelected,
+                        text: deliveryLocationSelected
+                            ? "تم اختيار موقع المستلم"
+                            : "حدد عنوان الاستلام على الخريطة",
                       ),
                     ),
 
                     const SizedBox(height: 12),
 
                     GestureDetector(
-                      onTap: () {
-                        showModalBottomSheet(
+                      onTap: () async {
+                        await showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
                           builder: (_) => const DeliveryInfoBottomSheet(),
                         );
-                      },
 
+                        setState(() {
+                          deliveryDetailsSelected = true;
+                        });
+                      },
                       child: _customField(
                         icon: Icons.gps_fixed,
                         iconColor: Colors.grey,
-                        text: "تفاصيل عنوان المستلم",
+                        selected: deliveryDetailsSelected,
+                        text: deliveryDetailsSelected
+                            ? "تم إدخال بيانات المستلم"
+                            : "تفاصيل عنوان المستلم",
                       ),
                     ),
 
@@ -275,6 +313,26 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                           print(
                             "Delivery Lng: ${createshipCubit.deliverylngController.text}",
                           );
+
+                          final cubit = context.read<CreateShipCubit>();
+
+                          if (cubit.scheduleController.text.isEmpty) {
+                            _showError("يرجى تحديد موعد التحميل");
+                            return;
+                          }
+
+                          if (cubit.pickuplatController.text.isEmpty ||
+                              cubit.pickuplngController.text.isEmpty) {
+                            _showError("يرجى تحديد موقع المرسل");
+                            return;
+                          }
+
+                          if (cubit.deliverylatController.text.isEmpty ||
+                              cubit.deliverylngController.text.isEmpty) {
+                            _showError("يرجى تحديد موقع المستلم");
+                            return;
+                          }
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -319,6 +377,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
     required IconData icon,
     required String text,
     required Color iconColor,
+    bool selected = false,
   }) {
     return Container(
       height: 50,
@@ -337,7 +396,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
         child: Row(
           children: [
             Icon(icon, color: iconColor, size: 18),
-
+            if (selected) const Icon(Icons.check_circle, color: Colors.green),
             const SizedBox(width: 10),
 
             Expanded(

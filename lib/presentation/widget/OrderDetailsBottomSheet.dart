@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goods_delivery_app/const/strings.dart' show ApiConstants;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
@@ -94,7 +95,47 @@ class OrderDetailsBottomSheet extends StatelessWidget {
                   //   ),
                   // ),
                   const SizedBox(height: 20),
+                  if (shipment.mediaUrls != null &&
+                      shipment.mediaUrls!.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _sectionTitle("صور الشحنة"),
+                        const SizedBox(height: 10),
 
+                        SizedBox(
+                          height: 120,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: shipment.mediaUrls!.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 10),
+                            itemBuilder: (context, index) {
+                              final imageUrl =
+                                  "${ApiConstants.imageBaseUrl}${shipment.mediaUrls![index]}";
+                              print(imageUrl);
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  imageUrl,
+                                  width: 120,
+                                  height: 120,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    width: 120,
+                                    height: 120,
+                                    color: Colors.grey.shade300,
+                                    child: const Icon(Icons.broken_image),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+
+                        const SizedBox(height: 18),
+                      ],
+                    ),
                   _sectionTitle("معلومات الشحنة"),
 
                   _infoCard(

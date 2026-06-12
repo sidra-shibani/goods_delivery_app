@@ -12,6 +12,12 @@ class PickupInfoBottomSheet extends StatefulWidget {
 }
 
 class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -172,6 +178,16 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                         print(
                           " ${createshipCubit.pickupaddressController.text}",
                         );
+                        final cubit = context.read<CreateShipCubit>();
+
+                        if (cubit.pickupnameController.text.isEmpty ||
+                            cubit.pickupphoneController.text.isEmpty ||
+                            cubit.pickupaddressController.text.isEmpty ||
+                            cubit.pickupstreetController.text.isEmpty ||
+                            cubit.pickupbuildingController.text.isEmpty) {
+                          _showError("يرجى إدخال تفاصيل عنوان التحميل");
+                          return;
+                        }
                         Navigator.pop(context);
                       },
 

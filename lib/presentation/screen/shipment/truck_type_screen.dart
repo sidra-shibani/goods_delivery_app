@@ -129,7 +129,19 @@ class _TruckTypeScreenState extends State<TruckTypeScreen> {
           selectedTruck = title;
         });
 
-        createshipCubit.truckTypeController.text = title;
+        switch (title) {
+          case "مغلقة":
+            createshipCubit.truckTypeController.text = "closed";
+            break;
+
+          case "مفتوحة":
+            createshipCubit.truckTypeController.text = "open";
+            break;
+
+          case "براد":
+            createshipCubit.truckTypeController.text = "refrigerated";
+            break;
+        }
       },
 
       child: Container(

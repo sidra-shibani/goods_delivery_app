@@ -217,14 +217,28 @@ class HomePage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 15),
-                        Text(
-                          "طلباتي الجارية",
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                context.read<GetShipCubit>().fetchShip();
+                              },
+                              icon: const Icon(
+                                Icons.refresh,
+                                color: Color(0xff4A5D8F),
+                              ),
+                            ),
+                            Text(
+                              "طلباتي الجارية",
 
-                          style: GoogleFonts.cairo(
-                            color: AppColors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+                              style: GoogleFonts.cairo(
+                                color: AppColors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
                         ),
 
                         //const SizedBox(height: 15),
@@ -234,8 +248,20 @@ class HomePage extends StatelessWidget {
                             child: BlocBuilder<GetShipCubit, ShipmentState>(
                               builder: (context, state) {
                                 if (state is GetShipLoaded) {
-                                  final shipments =
-                                      state.shipment.data.shipments;
+                                  final shipments = state
+                                      .shipment
+                                      .data
+                                      .shipments
+                                      .where(
+                                        (s) =>
+                                            s.status == "created" ||
+                                            s.status == "pending" ||
+                                            s.status == "accepted" ||
+                                            s.status == "assigned" ||
+                                            s.status == "picked_up" ||
+                                            s.status == "in_transit",
+                                      )
+                                      .toList();
                                   return ListView.builder(
                                     itemCount: shipments.length,
                                     itemBuilder: (context, index) {
@@ -405,31 +431,44 @@ class OrdersPage extends StatelessWidget {
               child: BlocBuilder<GetShipCubit, ShipmentState>(
                 builder: (context, state) {
                   if (state is GetShipLoaded) {
-                    final shipments = state.shipment.data.shipments;
-                    return ListView.builder(
-                      itemCount: shipments.length,
-                      itemBuilder: (context, index) {
-                        final shipment = shipments[index];
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 16,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (_) =>
-                                    OrderDetailsBottomSheet(shipment: shipment),
-                              );
-                            },
-                            child: OrderCard(shipment: shipment),
-                          ),
-                        );
+                    final shipments = state.shipment.data.shipments
+                        .where(
+                          (s) =>
+                              s.status == "delivered" ||
+                              s.status == "cancelled" ||
+                              s.status == "expired",
+                        )
+                        .toList();
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        context.read<GetShipCubit>().fetchShip();
                       },
+                      child: ListView.builder(
+                        itemCount: shipments.length,
+                        itemBuilder: (context, index) {
+                          final shipment = shipments[index];
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 6,
+                              horizontal: 16,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => OrderDetailsBottomSheet(
+                                    shipment: shipment,
+                                  ),
+                                );
+                              },
+                              child: OrderCard(shipment: shipment),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   }
 
