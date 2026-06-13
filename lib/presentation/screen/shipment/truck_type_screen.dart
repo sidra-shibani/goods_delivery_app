@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../const/colors.dart';
 import 'truck_size_screen.dart';
@@ -18,6 +19,8 @@ class _TruckTypeScreenState extends State<TruckTypeScreen> {
   @override
   Widget build(BuildContext context) {
     final createshipCubit = context.read<CreateShipCubit>();
+
+    final pricecubit = context.read<PriceCubit>();
     return Scaffold(
       backgroundColor: AppColors.white,
 
@@ -121,6 +124,7 @@ class _TruckTypeScreenState extends State<TruckTypeScreen> {
 
   Widget _truckCard(BuildContext context, String title, String image) {
     final createshipCubit = context.read<CreateShipCubit>();
+    final pricecubit = context.read<PriceCubit>();
     bool selected = selectedTruck == title;
 
     return GestureDetector(
@@ -132,14 +136,17 @@ class _TruckTypeScreenState extends State<TruckTypeScreen> {
         switch (title) {
           case "مغلقة":
             createshipCubit.truckTypeController.text = "closed";
+            pricecubit.truckTypeController.text = "closed";
             break;
 
           case "مفتوحة":
             createshipCubit.truckTypeController.text = "open";
+            pricecubit.truckTypeController.text = "open";
             break;
 
           case "براد":
             createshipCubit.truckTypeController.text = "refrigerated";
+            pricecubit.truckTypeController.text = "refrigerated";
             break;
         }
       },

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/getShip_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
 import 'package:goods_delivery_app/datasource/webserver/Auth_server.dart';
@@ -45,6 +46,9 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) =>
                 GetShipCubit(context.read<ShipmentRepo>())..fetchShip(),
+          ),
+          BlocProvider(
+            create: (context) => PriceCubit(context.read<ShipmentRepo>()),
           ),
         ],
         child: MaterialApp(

@@ -52,7 +52,7 @@ class AuthService {
 
   Future<Response> login(String phonenumber, String password) {
     final body = {'phone_number': phonenumber, 'password': password};
-    return dio.post('/account-center/login', data: json.encode(body));
+    return dio.post('/account-center/merchant/login', data: json.encode(body));
   }
 
   Future<Response> signUp(RegisterRequest model) {

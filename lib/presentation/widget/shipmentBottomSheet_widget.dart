@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
 import 'package:goods_delivery_app/presentation/screen/shipment/truck_type_screen.dart';
 import 'package:goods_delivery_app/presentation/widget/MapScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,7 +38,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
       child: Builder(
         builder: (formContext) {
           final createshipCubit = formContext.read<CreateShipCubit>();
-
+          final pricecubit = formContext.read<PriceCubit>();
           return Form(
             key: createshipCubit.formKey1,
             child: Container(
@@ -135,6 +136,8 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                         createshipCubit.scheduleController.text = utcDateTime
                             .toIso8601String();
 
+                        pricecubit.scheduleController.text = utcDateTime
+                            .toIso8601String();
                         setState(() {
                           selectedDate = dateTime;
                         });

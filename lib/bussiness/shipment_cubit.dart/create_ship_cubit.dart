@@ -1,11 +1,11 @@
 import 'package:bloc/bloc.dart';
 
 import 'package:flutter/material.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
+
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
-import 'package:goods_delivery_app/datasource/model/register_model.dart';
+
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
-import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
+
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
 
 class CreateShipCubit extends Cubit<ShipmentState> {

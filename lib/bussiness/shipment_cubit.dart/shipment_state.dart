@@ -22,3 +22,9 @@ class GetShipLoaded extends ShipmentState {
 
   GetShipLoaded(this.shipment);
 }
+
+class GetPriceLoaded extends ShipmentState {
+  final ShipmentPriceResponse price;
+
+  GetPriceLoaded(this.price);
+}

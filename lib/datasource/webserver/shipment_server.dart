@@ -67,4 +67,11 @@ class ShipmentServer {
   Future<Response> getMyshipments() {
     return dio.get('/merchant/shipments');
   }
+
+  Future<Response> getShipmentPrice(CalculatePriceRequest model) {
+    return dio.get(
+      '/merchant/shipments/calculate-price',
+      queryParameters: model.toJson(),
+    );
+  }
 }

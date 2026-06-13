@@ -148,28 +148,66 @@ class Merchant {
 
 class Driver {
   final int id;
+  final String fullName;
+  final String email;
+  final String phoneNumber;
+  final int age;
+  final String gender;
+  final String vehicleType;
+  final int vehicleCapacityKg;
+  final String? description;
 
-  Driver({required this.id});
+  Driver({
+    required this.id,
+    required this.fullName,
+    required this.email,
+    required this.phoneNumber,
+    required this.age,
+    required this.gender,
+    required this.vehicleType,
+    required this.vehicleCapacityKg,
+    this.description,
+  });
 
   factory Driver.fromJson(Map<String, dynamic> json) {
-    return Driver(id: json['id'] ?? 0);
+    return Driver(
+      id: json['id'] ?? 0,
+      fullName: json['full_name'] ?? 'غير محدد',
+      email: json['email'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
+      age: (json['age'] ?? 0),
+      gender: json['gender'] ?? '',
+      vehicleType: json['vehicle_type'] ?? '',
+      vehicleCapacityKg: (json['vehicle_capacity_kg'] ?? 0),
+      description: json['description'],
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {"id": id};
+    return {
+      "id": id,
+      "full_name": fullName,
+      "email": email,
+      "phone_number": phoneNumber,
+      "age": age,
+      "gender": gender,
+      "vehicle_type": vehicleType,
+      "vehicle_capacity_kg": vehicleCapacityKg,
+      "description": description,
+    };
   }
 }
 
 class RouteModel {
   final String overviewPolyline;
 
-  final String pickUpLat;
-  final String pickUpLng;
+  final double pickUpLat;
+  final double pickUpLng;
 
   final Checkpoint pickUpCheckpointDetails;
 
-  final String deliveryLat;
-  final String deliveryLng;
+  final double deliveryLat;
+  final double deliveryLng;
 
   final Checkpoint deliveryCheckpointDetails;
 
@@ -191,13 +229,15 @@ class RouteModel {
   factory RouteModel.fromJson(Map<String, dynamic> json) {
     return RouteModel(
       overviewPolyline: json['overview_polyline'] ?? '',
-      pickUpLat: json['pick_up_lat'] ?? '',
-      pickUpLng: json['pick_up_lng'] ?? '',
+      pickUpLat: double.tryParse(json['pick_up_lat'].toString()) ?? 0.0,
+      pickUpLng: double.tryParse(json['pick_up_lng'].toString()) ?? 0.0,
+
+      deliveryLat: double.tryParse(json['delivery_lat'].toString()) ?? 0.0,
+      deliveryLng: double.tryParse(json['delivery_lng'].toString()) ?? 0.0,
       pickUpCheckpointDetails: Checkpoint.fromJson(
         json['pick_up_checkpoint_details'] ?? {},
       ),
-      deliveryLat: json['delivery_lat'] ?? '',
-      deliveryLng: json['delivery_lng'] ?? '',
+
       deliveryCheckpointDetails: Checkpoint.fromJson(
         json['delivery_checkpoint_details'] ?? {},
       ),
@@ -339,10 +379,10 @@ class RouteRequest {
     return {
       "overview_polyline": overviewPolyline,
       "pick_up_lat": pickUpLat,
-      "pick_up_lng": pickUpLng,
+      "pick_up_lon": pickUpLng,
       "pick_up_checkpoint_details": pickUpCheckpointDetails.toJson(),
       "delivery_lat": deliveryLat,
-      "delivery_lng": deliveryLng,
+      "delivery_lon": deliveryLng,
       "delivery_checkpoint_details": deliveryCheckpointDetails.toJson(),
       "distance": distance,
       "duration_minutes": durationMinutes,
@@ -388,6 +428,60 @@ class ShipmentListData {
               ?.map((e) => ShipmentData.fromJson(e))
               .toList() ??
           [],
+    );
+  }
+}
+
+//موديل لحساب السعر
+class CalculatePriceRequest {
+  final String scheduledPickupAt;
+  final double distance;
+  final double weight;
+  final String vehicleType;
+
+  CalculatePriceRequest({
+    required this.scheduledPickupAt,
+    required this.distance,
+    required this.weight,
+    required this.vehicleType,
+  });
+
+  Map<String, dynamic> toJson() => {
+    "scheduled_pickup_at": scheduledPickupAt,
+    "distance": distance,
+    "weight": weight,
+    "vehicle_type": vehicleType,
+  };
+}
+
+class ShipmentPriceResponse {
+  final String status;
+  final String message;
+  final ShipmentPriceData data;
+
+  ShipmentPriceResponse({
+    required this.status,
+    required this.message,
+    required this.data,
+  });
+
+  factory ShipmentPriceResponse.fromJson(Map<String, dynamic> json) {
+    return ShipmentPriceResponse(
+      status: json['status'] ?? '',
+      message: json['message'] ?? '',
+      data: ShipmentPriceData.fromJson(json['data'] ?? {}),
+    );
+  }
+}
+
+class ShipmentPriceData {
+  final double estimatedPrice;
+
+  ShipmentPriceData({required this.estimatedPrice});
+
+  factory ShipmentPriceData.fromJson(Map<String, dynamic> json) {
+    return ShipmentPriceData(
+      estimatedPrice: (json['estimated_price'] as num).toDouble(),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 import 'package:goods_delivery_app/presentation/screen/shipment/OrderSummaryScreen.dart';
@@ -39,11 +40,11 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<CreateShipCubit, ShipmentState>(
+    return BlocListener<PriceCubit, ShipmentState>(
       listener: (context, state) {
-        if (state is createShipLoaded) {
-          print("تم انشاء شحنة");
-          final createShipCubit = context.read<CreateShipCubit>();
+        if (state is GetPriceLoaded) {
+          print("تم جلب السعر  ة");
+
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => OrderSummaryScreen()),
@@ -79,6 +80,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
             child: Builder(
               builder: (formContext) {
                 final createShipCubit = formContext.read<CreateShipCubit>();
+                final pricecubit = formContext.read<PriceCubit>();
                 return Form(
                   key: createShipCubit.formKey4,
                   child: Column(
@@ -178,6 +180,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                         });
                                         createShipCubit.weightController.text =
                                             piecesweight.toString();
+                                        pricecubit.weightController.text =
+                                            piecesweight.toString();
                                       },
 
                                       icon: Icon(
@@ -209,6 +213,8 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                               .weightController
                                               .text = piecesweight
                                               .toString();
+                                          pricecubit.weightController.text =
+                                              piecesweight.toString();
                                         }
                                       },
 
@@ -461,7 +467,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
                       const SizedBox(height: 15),
 
-                      BlocBuilder<CreateShipCubit, ShipmentState>(
+                      BlocBuilder<PriceCubit, ShipmentState>(
                         builder: (context, state) {
                           if (state is ShipLoading) {
                             return ElevatedButton(
@@ -489,100 +495,20 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
                             child: ElevatedButton(
                               onPressed: () {
-                                final request = ShipmentRequest(
-                                  goodsType:
-                                      createShipCubit.goodsTypeController.text,
-
+                                final request = CalculatePriceRequest(
+                                  scheduledPickupAt:
+                                      pricecubit.scheduleController.text,
+                                  distance: 75,
                                   weight:
                                       double.tryParse(
-                                        createShipCubit.weightController.text,
+                                        pricecubit.weightController.text,
                                       ) ??
                                       0,
-
                                   vehicleType:
-                                      createShipCubit.truckTypeController.text,
-
-                                  vehicleCapacityKg:
-                                      createShipCubit.trucksizeController.text,
-
-                                  whoPays: createShipCubit.whoPays,
-
-                                  scheduledPickupAt:
-                                      createShipCubit.scheduleController.text,
-
-                                  additionalDetails:
-                                      createShipCubit.notesController.text,
-
-                                  media: [],
-
-                                  route: RouteRequest(
-                                    overviewPolyline: "abcd1234encodedpolyline",
-
-                                    pickUpLat: createShipCubit
-                                        .pickuplatController
-                                        .text,
-                                    pickUpLng: createShipCubit
-                                        .pickuplngController
-                                        .text,
-
-                                    deliveryLat: createShipCubit
-                                        .deliverylatController
-                                        .text,
-                                    deliveryLng: createShipCubit
-                                        .deliverylngController
-                                        .text,
-
-                                    distance: 75,
-                                    durationMinutes: 90,
-
-                                    pickUpCheckpointDetails: CheckpointRequest(
-                                      supervisorName: createShipCubit
-                                          .pickupnameController
-                                          .text,
-
-                                      supervisorPhoneNumber: createShipCubit
-                                          .pickupphoneController
-                                          .text,
-
-                                      address: createShipCubit
-                                          .pickupaddressController
-                                          .text,
-
-                                      street: createShipCubit
-                                          .pickupstreetController
-                                          .text,
-
-                                      buildingNumber: createShipCubit
-                                          .pickupbuildingController
-                                          .text,
-                                    ),
-
-                                    deliveryCheckpointDetails:
-                                        CheckpointRequest(
-                                          supervisorName: createShipCubit
-                                              .deliverynameController
-                                              .text,
-
-                                          supervisorPhoneNumber: createShipCubit
-                                              .deliveryphoneController
-                                              .text,
-
-                                          address: createShipCubit
-                                              .deliveryaddressController
-                                              .text,
-
-                                          street: createShipCubit
-                                              .deliverystreetController
-                                              .text,
-
-                                          buildingNumber: createShipCubit
-                                              .deliverybuildingController
-                                              .text,
-                                        ),
-                                  ),
+                                      pricecubit.truckTypeController.text,
                                 );
 
-                                createShipCubit.createShip(request);
+                                pricecubit.getprice(request);
                               },
 
                               style: ElevatedButton.styleFrom(

@@ -94,7 +94,7 @@ class OrderCard extends StatelessWidget {
                           ),
 
                           Text(
-                            "وقت الطلب : ${DateTime.parse(shipment.createdAt).hour.toString().padLeft(2, '0')}:${DateTime.parse(shipment.createdAt).minute.toString().padLeft(2, '0')}",
+                            "نوع الطلب : ${shipment.goodsType}",
                             style: GoogleFonts.cairo(
                               color: Colors.grey.shade700,
                               fontWeight: FontWeight.bold,

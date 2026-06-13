@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
+import 'package:goods_delivery_app/presentation/screen/TripTrackingScreen.dart';
 import 'package:goods_delivery_app/presentation/widget/OrderDetailsBottomSheet.dart';
 import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
 import 'package:goods_delivery_app/presentation/widget/orderCard_widget.dart';
@@ -240,7 +241,15 @@ class HomePage extends StatelessWidget {
                             ),
                           ],
                         ),
+                        Text(
+                          "اضغط على أي طلب لتتبع الرحلة",
 
+                          style: GoogleFonts.cairo(
+                            color: AppColors.naturalgray,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
                         //const SizedBox(height: 15),
                         Expanded(
                           child: Padding(
@@ -252,15 +261,7 @@ class HomePage extends StatelessWidget {
                                       .shipment
                                       .data
                                       .shipments
-                                      .where(
-                                        (s) =>
-                                            s.status == "created" ||
-                                            s.status == "pending" ||
-                                            s.status == "accepted" ||
-                                            s.status == "assigned" ||
-                                            s.status == "picked_up" ||
-                                            s.status == "in_transit",
-                                      )
+                                      .where((s) => s.status == "in_transit")
                                       .toList();
                                   return ListView.builder(
                                     itemCount: shipments.length,
@@ -273,15 +274,14 @@ class HomePage extends StatelessWidget {
                                         ),
                                         child: GestureDetector(
                                           onTap: () {
-                                            showModalBottomSheet(
-                                              context: context,
-                                              isScrollControlled: true,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              builder: (_) =>
-                                                  OrderDetailsBottomSheet(
-                                                    shipment: shipment,
-                                                  ),
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    TripTrackingScreen(
+                                                      shipment: shipment,
+                                                    ),
+                                              ),
                                             );
                                           },
                                           child: OrderCard(shipment: shipment),
@@ -381,94 +381,146 @@ class HomePage extends StatelessWidget {
 }
 
 // ================= ORDERS PAGE =================
-
-class OrdersPage extends StatelessWidget {
+class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
+
+  @override
+  State<OrdersPage> createState() => _OrdersPageState();
+}
+
+class _OrdersPageState extends State<OrdersPage> {
+  bool showActive = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF8F8F8),
-
       body: SafeArea(
         child: Column(
           children: [
+            _buildHeader(),
+
+            // 🔘 Toggle Slider
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.menu, color: Color(0xff4A5D8F)),
-                  ),
-
-                  const Spacer(),
-
-                  Text(
-                    "طلباتي",
-                    style: GoogleFonts.cairo(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                height: 45,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Stack(
+                  children: [
+                    AnimatedAlign(
+                      duration: const Duration(milliseconds: 250),
+                      alignment: showActive
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 2 - 20,
+                        decoration: BoxDecoration(
+                          color: const Color(0xff4A5D8F),
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
                     ),
-                  ),
 
-                  const Spacer(),
-
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.notifications,
-                      color: Color(0xff4A5D8F),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => showActive = false);
+                            },
+                            child: Center(
+                              child: Text(
+                                "المنتهية",
+                                style: GoogleFonts.cairo(
+                                  color: showActive
+                                      ? Colors.black
+                                      : Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => showActive = true);
+                            },
+                            child: Center(
+                              child: Text(
+                                "قيد الإنشاء",
+                                style: GoogleFonts.cairo(
+                                  color: showActive
+                                      ? Colors.white
+                                      : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+
+            const SizedBox(height: 10),
 
             Expanded(
               child: BlocBuilder<GetShipCubit, ShipmentState>(
                 builder: (context, state) {
                   if (state is GetShipLoaded) {
-                    final shipments = state.shipment.data.shipments
-                        .where(
-                          (s) =>
-                              s.status == "delivered" ||
-                              s.status == "cancelled" ||
-                              s.status == "expired",
-                        )
-                        .toList();
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        context.read<GetShipCubit>().fetchShip();
-                      },
-                      child: ListView.builder(
-                        itemCount: shipments.length,
-                        itemBuilder: (context, index) {
-                          final shipment = shipments[index];
+                    final allShipments = state.shipment.data.shipments;
 
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 16,
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (_) => OrderDetailsBottomSheet(
-                                    shipment: shipment,
-                                  ),
-                                );
-                              },
-                              child: OrderCard(shipment: shipment),
-                            ),
-                          );
-                        },
-                      ),
+                    final activeShipments = allShipments.where((s) {
+                      return s.status == "created" ||
+                          s.status == "pending" ||
+                          s.status == "accepted" ||
+                          s.status == "assigned" ||
+                          s.status == "picked_up" ||
+                          s.status == "on_way_to_pickup";
+                    }).toList();
+
+                    final finishedShipments = allShipments.where((s) {
+                      return s.status == "delivered" ||
+                          s.status == "cancelled" ||
+                          s.status == "expired";
+                    }).toList();
+
+                    final data = showActive
+                        ? activeShipments
+                        : finishedShipments;
+
+                    return ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        final shipment = data[index];
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 16,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (_) =>
+                                    OrderDetailsBottomSheet(shipment: shipment),
+                              );
+                            },
+                            child: OrderCard(shipment: shipment),
+                          ),
+                        );
+                      },
                     );
                   }
 
@@ -478,6 +530,31 @@ class OrdersPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  // 🔹 Header
+  Widget _buildHeader() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.menu, color: Color(0xff4A5D8F)),
+          ),
+          const Spacer(),
+          Text(
+            "طلباتي",
+            style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.w700),
+          ),
+          const Spacer(),
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.notifications, color: Color(0xff4A5D8F)),
+          ),
+        ],
       ),
     );
   }
