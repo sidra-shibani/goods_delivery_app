@@ -28,3 +28,5 @@ class GetPriceLoaded extends ShipmentState {
 
   GetPriceLoaded(this.price);
 }
+
+class RouteCalculatedState extends ShipmentState {}

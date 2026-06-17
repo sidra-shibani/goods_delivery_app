@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/signUp_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/resetpassword_screen.dart';
-import 'package:goods_delivery_app/presentation/screen/signUp_Screen.dart';
+
 import 'package:goods_delivery_app/presentation/screen/signupFlow.dart';
 import 'package:google_fonts/google_fonts.dart';
 

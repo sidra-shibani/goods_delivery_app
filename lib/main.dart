@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/getShip_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
+
+import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart';
+
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
+import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
 import 'package:goods_delivery_app/datasource/webserver/Auth_server.dart';
+import 'package:goods_delivery_app/datasource/webserver/rating_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/shipment_server.dart';
-import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
 
 import 'package:goods_delivery_app/presentation/screen/welcomepage_screen.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +38,11 @@ class MyApp extends StatelessWidget {
         Provider<ShipmentRepo>(
           create: (context) => ShipmentRepo(context.read<ShipmentServer>()),
         ),
+        //Rating
+        Provider<RatingServer>(create: (_) => RatingServer()),
+        Provider<RatingRepo>(
+          create: (context) => RatingRepo(context.read<RatingServer>()),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -49,6 +58,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => PriceCubit(context.read<ShipmentRepo>()),
+          ),
+          BlocProvider(
+            create: (context) => GiveratingCubit(context.read<RatingRepo>()),
           ),
         ],
         child: MaterialApp(

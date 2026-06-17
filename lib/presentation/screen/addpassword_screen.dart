@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/signUp_cubit.dart';
+
+import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Auth_cubit/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 
 import 'package:goods_delivery_app/presentation/screen/addprofiledet_screen.dart';

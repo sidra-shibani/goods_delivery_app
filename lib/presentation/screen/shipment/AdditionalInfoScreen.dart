@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 import 'package:goods_delivery_app/presentation/screen/shipment/OrderSummaryScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,7 +27,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
   ];
 
   int piecesCount = 1;
-  int piecesweight = 1;
+  int piecesweight = 0;
   String payer = "sender";
 
   final TextEditingController notesController = TextEditingController();
@@ -151,7 +151,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                               const SizedBox(height: 25),
 
                               Text(
-                                "وزن الحمولة",
+                                "وزن الحمولة كغ",
                                 style: GoogleFonts.cairo(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -176,7 +176,7 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                     IconButton(
                                       onPressed: () {
                                         setState(() {
-                                          piecesweight++;
+                                          piecesweight += 10;
                                         });
                                         createShipCubit.weightController.text =
                                             piecesweight.toString();
@@ -205,17 +205,18 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
                                     IconButton(
                                       onPressed: () {
-                                        if (piecesweight > 1) {
-                                          setState(() {
-                                            piecesweight--;
-                                          });
-                                          createShipCubit
-                                              .weightController
-                                              .text = piecesweight
-                                              .toString();
-                                          pricecubit.weightController.text =
-                                              piecesweight.toString();
-                                        }
+                                        setState(() {
+                                          if (piecesweight >= 10) {
+                                            piecesweight -= 10;
+                                          } else {
+                                            piecesweight = 0;
+                                          }
+                                        });
+
+                                        createShipCubit.weightController.text =
+                                            piecesweight.toString();
+                                        pricecubit.weightController.text =
+                                            piecesweight.toString();
                                       },
 
                                       icon: Icon(

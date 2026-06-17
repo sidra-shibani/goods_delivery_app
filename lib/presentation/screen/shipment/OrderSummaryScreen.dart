@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../const/colors.dart';
@@ -437,8 +437,11 @@ class OrderSummaryScreen extends StatelessWidget {
                           media: [],
 
                           route: RouteRequest(
-                            overviewPolyline: "abcd1234encodedpolyline",
-
+                            //
+                            overviewPolyline: createShipCubit.polyline ?? "",
+                            distance: createShipCubit.distance ?? 0,
+                            durationMinutes:
+                                (createShipCubit.duration ?? 0) ~/ 60,
                             pickUpLat: createShipCubit.pickuplatController.text,
                             pickUpLng: createShipCubit.pickuplngController.text,
 
@@ -447,9 +450,7 @@ class OrderSummaryScreen extends StatelessWidget {
                             deliveryLng:
                                 createShipCubit.deliverylngController.text,
 
-                            distance: 75,
-                            durationMinutes: 90,
-
+                            //
                             pickUpCheckpointDetails: CheckpointRequest(
                               supervisorName:
                                   createShipCubit.pickupnameController.text,

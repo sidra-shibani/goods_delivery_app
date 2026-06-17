@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 
 import 'package:flutter/material.dart';
 
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
-
+import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
+import 'package:goods_delivery_app/datasource/services/directions_service.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
@@ -44,7 +44,9 @@ class CreateShipCubit extends Cubit<ShipmentState> {
   final goodsTypeController = TextEditingController();
   final weightController = TextEditingController();
   String whoPays = "sender";
-  String overviewPolyline = "";
+  String? polyline;
+  double? distance;
+  int? duration;
   final piecesCountController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
   TextEditingController trucksizeNameController = TextEditingController();
@@ -67,5 +69,25 @@ class CreateShipCubit extends Cubit<ShipmentState> {
     } catch (e) {
       emit(ShipError('An unexpected error occurred.'));
     }
+  }
+
+  Future<void> getRouteData({
+    required double pickLat,
+    required double pickLng,
+    required double delLat,
+    required double delLng,
+  }) async {
+    final result = await DirectionsService.getRoute(
+      originLat: pickLat,
+      originLng: pickLng,
+      destLat: delLat,
+      destLng: delLng,
+    );
+
+    polyline = result["polyline"];
+    distance = (result["distance"] as num).toDouble();
+    duration = result["duration"];
+
+    emit(RouteCalculatedState()); // اعمل state جديد
   }
 }

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/Auth_cubit.dart/login_cubit.dart';
+
+import 'package:goods_delivery_app/bussiness/Auth_cubit/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
-import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
-import 'package:goods_delivery_app/presentation/screen/Otp_screen.dart';
+
 import 'package:goods_delivery_app/presentation/screen/addpassword_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../bussiness/Auth_cubit.dart/signUp_cubit.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -19,7 +17,6 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   @override
-  bool isPasswordHidden = true;
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,

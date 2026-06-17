@@ -157,8 +157,8 @@ String getStatusText(String status) {
     case "created":
       return "قيد الإنشاء";
 
-    case "pending":
-      return "بانتظار الموافقة";
+    case "scheduled":
+      return "بالانتظار";
 
     case "accepted":
       return "تم القبول";

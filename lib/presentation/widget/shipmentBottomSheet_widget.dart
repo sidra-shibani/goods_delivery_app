@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:goods_delivery_app/presentation/screen/shipment/truck_type_screen.dart';
 import 'package:goods_delivery_app/presentation/widget/MapScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,11 +24,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
 
   bool pickupDetailsSelected = false;
   bool deliveryDetailsSelected = false;
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
-  }
+  String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +33,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
 
       child: Builder(
         builder: (formContext) {
+          final rootContext = ScaffoldMessenger.of(context).context;
           final createshipCubit = formContext.read<CreateShipCubit>();
           final pricecubit = formContext.read<PriceCubit>();
           return Form(
@@ -77,6 +74,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                       children: [
                         IconButton(
                           onPressed: () {
+                            _clearFields(createshipCubit);
                             Navigator.pop(context);
                           },
 
@@ -162,6 +160,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                       onTap: () async {
                         final location = await showModalBottomSheet(
                           context: context,
+                          useRootNavigator: true,
                           isScrollControlled: true,
                           builder: (_) => const MapPickerScreen(),
                         );
@@ -178,7 +177,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                           setState(() {
                             pickupLocationSelected = true;
                           });
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          ScaffoldMessenger.of(rootContext).showSnackBar(
                             const SnackBar(
                               content: Text("تم حفظ موقع التحميل"),
                             ),
@@ -245,11 +244,26 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                               .longitude
                               .toString();
 
+                          await createshipCubit.getRouteData(
+                            pickLat: double.parse(
+                              createshipCubit.pickuplatController.text,
+                            ),
+                            pickLng: double.parse(
+                              createshipCubit.pickuplngController.text,
+                            ),
+                            delLat: location.latitude,
+                            delLng: location.longitude,
+                          );
+
+                          print("Polyline = ${createshipCubit.polyline}");
+                          print("Distance = ${createshipCubit.distance}");
+                          print("Duration = ${createshipCubit.duration}");
+
                           setState(() {
                             deliveryLocationSelected = true;
                           });
 
-                          ScaffoldMessenger.of(context).showSnackBar(
+                          ScaffoldMessenger.of(rootContext).showSnackBar(
                             const SnackBar(
                               content: Text("تم حفظ موقع الاستلام"),
                             ),
@@ -293,13 +307,45 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                     ),
 
                     const Spacer(),
-
+                    if (errorMessage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.red),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                color: Colors.red,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  errorMessage!,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     SizedBox(
                       width: double.infinity,
                       height: 50,
 
                       child: ElevatedButton(
                         onPressed: () {
+                          print("BUTTON PRESSED");
                           print(
                             "Schedule: ${createshipCubit.scheduleController.text}",
                           );
@@ -318,21 +364,13 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                           );
 
                           final cubit = context.read<CreateShipCubit>();
-
-                          if (cubit.scheduleController.text.isEmpty) {
-                            _showError("يرجى تحديد موعد التحميل");
-                            return;
-                          }
-
-                          if (cubit.pickuplatController.text.isEmpty ||
-                              cubit.pickuplngController.text.isEmpty) {
-                            _showError("يرجى تحديد موقع المرسل");
-                            return;
-                          }
-
-                          if (cubit.deliverylatController.text.isEmpty ||
-                              cubit.deliverylngController.text.isEmpty) {
-                            _showError("يرجى تحديد موقع المستلم");
+                          final form = cubit.formKey1.currentState;
+                          if (form == null ||
+                              !form.validate() ||
+                              !_validateAll(cubit)) {
+                            setState(() {
+                              errorMessage = _getError(cubit);
+                            });
                             return;
                           }
 
@@ -418,5 +456,50 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
         ),
       ),
     );
+  }
+
+  bool _validateAll(CreateShipCubit cubit) {
+    if (cubit.scheduleController.text.isEmpty) return false;
+    if (cubit.pickuplatController.text.isEmpty) return false;
+    if (cubit.pickuplngController.text.isEmpty) return false;
+    if (cubit.deliverylatController.text.isEmpty) return false;
+    if (cubit.deliverylngController.text.isEmpty) return false;
+    if (!pickupDetailsSelected) return false;
+    if (!deliveryDetailsSelected) return false;
+    return true;
+  }
+
+  void _clearFields(CreateShipCubit cubit) {
+    cubit.scheduleController.clear();
+    cubit.pickuplatController.clear();
+    cubit.deliverylatController.clear();
+    cubit.pickuplngController.clear();
+    cubit.deliverylngController.clear();
+  }
+
+  String _getError(CreateShipCubit cubit) {
+    if (cubit.scheduleController.text.isEmpty) {
+      return "يرجى تحديد موعد التحميل";
+    }
+
+    if (cubit.pickuplatController.text.isEmpty ||
+        cubit.pickuplngController.text.isEmpty) {
+      return "يرجى تحديد موقع المرسل";
+    }
+
+    if (!pickupDetailsSelected) {
+      return "يرجى إدخال تفاصيل التحميل";
+    }
+
+    if (cubit.deliverylatController.text.isEmpty ||
+        cubit.deliverylngController.text.isEmpty) {
+      return "يرجى تحديد موقع المستلم";
+    }
+
+    if (!deliveryDetailsSelected) {
+      return "يرجى إدخال تفاصيل المستلم";
+    }
+
+    return "يرجى إكمال جميع البيانات";
   }
 }

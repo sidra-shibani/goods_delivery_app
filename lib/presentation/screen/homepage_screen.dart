@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/getShip_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/shipment_state.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
+import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
 import 'package:goods_delivery_app/presentation/screen/TripTrackingScreen.dart';
 import 'package:goods_delivery_app/presentation/widget/OrderDetailsBottomSheet.dart';
 import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
@@ -261,8 +263,36 @@ class HomePage extends StatelessWidget {
                                       .shipment
                                       .data
                                       .shipments
-                                      .where((s) => s.status == "in_transit")
+                                      .where(
+                                        (s) =>
+                                            s.status == "delivered" ||
+                                            s.status == "in_transit",
+                                      )
                                       .toList();
+                                  if (shipments.isEmpty) {
+                                    return Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.local_shipping_outlined,
+                                            size: 70,
+                                            color: Colors.grey.shade400,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            "لا يوجد شحنات جارية",
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
                                   return ListView.builder(
                                     itemCount: shipments.length,
                                     itemBuilder: (context, index) {
@@ -277,10 +307,19 @@ class HomePage extends StatelessWidget {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) =>
-                                                    TripTrackingScreen(
-                                                      shipment: shipment,
-                                                    ),
+                                                builder: (_) => BlocProvider(
+                                                  create: (context) =>
+                                                      GetRatingSummeryCubit(
+                                                        context
+                                                            .read<RatingRepo>(),
+                                                      )..fetchRatingSummery(
+                                                        shipment.driver?.id ??
+                                                            0,
+                                                      ),
+                                                  child: TripTrackingScreen(
+                                                    shipment: shipment,
+                                                  ),
+                                                ),
                                               ),
                                             );
                                           },
@@ -480,7 +519,7 @@ class _OrdersPageState extends State<OrdersPage> {
 
                     final activeShipments = allShipments.where((s) {
                       return s.status == "created" ||
-                          s.status == "pending" ||
+                          s.status == "scheduled" ||
                           s.status == "accepted" ||
                           s.status == "assigned" ||
                           s.status == "picked_up" ||
@@ -488,39 +527,43 @@ class _OrdersPageState extends State<OrdersPage> {
                     }).toList();
 
                     final finishedShipments = allShipments.where((s) {
-                      return s.status == "delivered" ||
-                          s.status == "cancelled" ||
-                          s.status == "expired";
+                      return s.status == "cancelled" || s.status == "expired";
                     }).toList();
 
                     final data = showActive
                         ? activeShipments
                         : finishedShipments;
 
-                    return ListView.builder(
-                      itemCount: data.length,
-                      itemBuilder: (context, index) {
-                        final shipment = data[index];
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 6,
-                            horizontal: 16,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (_) =>
-                                    OrderDetailsBottomSheet(shipment: shipment),
-                              );
-                            },
-                            child: OrderCard(shipment: shipment),
-                          ),
-                        );
+                    return RefreshIndicator(
+                      onRefresh: () async {
+                        await context.read<GetShipCubit>().fetchShip();
                       },
+                      child: ListView.builder(
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          final shipment = data[index];
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 6,
+                              horizontal: 16,
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (_) => OrderDetailsBottomSheet(
+                                    shipment: shipment,
+                                  ),
+                                );
+                              },
+                              child: OrderCard(shipment: shipment),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   }
 

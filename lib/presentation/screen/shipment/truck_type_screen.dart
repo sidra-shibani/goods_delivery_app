@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/price_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../const/colors.dart';
 import 'truck_size_screen.dart';
@@ -20,7 +20,6 @@ class _TruckTypeScreenState extends State<TruckTypeScreen> {
   Widget build(BuildContext context) {
     final createshipCubit = context.read<CreateShipCubit>();
 
-    final pricecubit = context.read<PriceCubit>();
     return Scaffold(
       backgroundColor: AppColors.white,
 

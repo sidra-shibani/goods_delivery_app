@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 
@@ -12,12 +12,35 @@ class PickupInfoBottomSheet extends StatefulWidget {
 }
 
 class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
-  }
+  String? selectedCitypickup;
+  String? selectedAreapickup;
+  final Map<String, List<String>> citiesWithAreas = {
+    "دمشق": ["المزة", "كفرسوسة", "ركن الدين", "المالكي", "الميدان", "برزة"],
 
+    "حلب": ["الجميلية", "الأعظمية", "صلاح الدين", "الفرقان", "السكري"],
+
+    "حمص": ["الوعر", "الزهراء", "عكرمة", "الخالدية"],
+
+    "حماة": ["القصور", "الحميدية", "البارودية"],
+
+    "اللاذقية": ["الصليبة", "الرمل الجنوبي", "مشروع الزراعة"],
+
+    "طرطوس": ["الكرامة", "الرادار", "الإنشاءات"],
+
+    "درعا": ["درعا البلد", "المحطة", "طريق السد"],
+
+    "السويداء": ["المزرعة", "شهبا", "صلخد"],
+  };
+  List<String> cities = [
+    "دمشق",
+    "حلب",
+    "حمص",
+    "حماة",
+    "اللاذقية",
+    "طرطوس",
+    "درعا",
+    "السويداء",
+  ];
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -62,6 +85,7 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                         children: [
                           IconButton(
                             onPressed: () {
+                              _clearFields(createshipCubit);
                               Navigator.pop(context);
                             },
 
@@ -103,6 +127,16 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                             controller: createshipCubit.pickupnameController,
                             hint: "الاسم",
                             icon: Icons.person_outline,
+                            keyboardType: TextInputType.name,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "يرجى إدخال الاسم الكامل";
+                              }
+                              if (value.trim().length < 3) {
+                                return "الاسم قصير جداً";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 12),
@@ -111,22 +145,182 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                             controller: createshipCubit.pickupphoneController,
                             hint: "رقم الهاتف",
                             icon: Icons.phone_outlined,
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "يرجى إدخال رقم الهاتف";
+                              }
+                              if (value.trim().length < 9) {
+                                return "رقم الهاتف غير صالح";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 12),
+                          DropdownButtonFormField<String>(
+                            value: selectedCitypickup,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCitypickup = value;
+                                selectedAreapickup = null;
+                              });
 
-                          _buildField(
-                            controller: createshipCubit.pickupaddressController,
-                            hint: "العنوان",
-                            icon: Icons.location_on_outlined,
+                              createshipCubit.pickupaddressController.text =
+                                  "${selectedCitypickup ?? ''}";
+                            },
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "يرجى اختيار المحافظة";
+                              }
+                              return null;
+                            },
+
+                            decoration: InputDecoration(
+                              hintText: "المحافظة",
+                              hintStyle: GoogleFonts.cairo(
+                                color: Colors.grey.shade600,
+                              ),
+
+                              prefixIcon: Icon(
+                                Icons.location_city,
+                                color: AppColors.mainblue,
+                              ),
+
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 15,
+                              ),
+
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            style: GoogleFonts.cairo(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                            dropdownColor: Colors.white,
+
+                            items: citiesWithAreas.keys.map((city) {
+                              return DropdownMenuItem(
+                                value: city,
+                                child: Text(city),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 20),
+
+                          DropdownButtonFormField<String>(
+                            value: selectedAreapickup,
+
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "يرجى اختيار المنطقة";
+                              }
+                              return null;
+                            },
+
+                            decoration: InputDecoration(
+                              hintText: "المنطقة",
+                              hintStyle: GoogleFonts.cairo(
+                                color: Colors.grey.shade600,
+                              ),
+
+                              prefixIcon: Icon(
+                                Icons.map,
+                                color: AppColors.mainblue,
+                              ),
+
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 15,
+                              ),
+
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            style: GoogleFonts.cairo(
+                              color: Colors.black,
+                              fontSize: 15,
+                            ),
+                            dropdownColor: Colors.white,
+
+                            items:
+                                (selectedCitypickup != null
+                                        ? citiesWithAreas[selectedCitypickup]!
+                                        : <String>[])
+                                    .map((area) {
+                                      return DropdownMenuItem(
+                                        value: area,
+                                        child: Text(area),
+                                      );
+                                    })
+                                    .toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedAreapickup = value;
+                              });
+
+                              createshipCubit.pickupaddressController.text =
+                                  "${selectedCitypickup ?? ''} - ${selectedAreapickup ?? ''}";
+                            },
                           ),
 
+                          // _buildField(
+                          //   controller: createshipCubit.pickupaddressController,
+                          //   hint: "العنوان",
+                          //   icon: Icons.location_on_outlined,
+                          //   keyboardType: TextInputType.streetAddress,
+                          //   validator: (value) {
+                          //     if (value == null || value.trim().isEmpty) {
+                          //       return "يرجى إدخال العنوان";
+                          //     }
+                          //     return null;
+                          //   },
+                          // ),
                           const SizedBox(height: 12),
 
                           _buildField(
                             controller: createshipCubit.pickupstreetController,
                             hint: "رقم الشارع",
                             icon: Icons.route_outlined,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "يرجى إدخال رقم الشارع";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 12),
@@ -136,6 +330,13 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                                 createshipCubit.pickupbuildingController,
                             hint: "رقم البناء",
                             icon: Icons.apartment_outlined,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "يرجى إدخال رقم البناء";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 12),
@@ -145,6 +346,7 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                             hint: "تفاصيل أخرى",
                             icon: Icons.notes_outlined,
                             maxLines: 3,
+                            keyboardType: TextInputType.multiline,
                           ),
                         ],
                       ),
@@ -178,17 +380,13 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
                         print(
                           " ${createshipCubit.pickupaddressController.text}",
                         );
-                        final cubit = context.read<CreateShipCubit>();
+                        // final cubit = context.read<CreateShipCubit>();
 
-                        if (cubit.pickupnameController.text.isEmpty ||
-                            cubit.pickupphoneController.text.isEmpty ||
-                            cubit.pickupaddressController.text.isEmpty ||
-                            cubit.pickupstreetController.text.isEmpty ||
-                            cubit.pickupbuildingController.text.isEmpty) {
-                          _showError("يرجى إدخال تفاصيل عنوان التحميل");
-                          return;
+                        final form = createshipCubit.formKey2.currentState;
+
+                        if (form != null && form.validate()) {
+                          Navigator.pop(context);
                         }
-                        Navigator.pop(context);
                       },
 
                       style: ElevatedButton.styleFrom(
@@ -221,33 +419,46 @@ class _PickupInfoBottomSheetState extends State<PickupInfoBottomSheet> {
     required TextEditingController controller,
     required String hint,
     required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
     int maxLines = 1,
   }) {
     return TextFormField(
       controller: controller,
+      keyboardType: keyboardType,
       maxLines: maxLines,
+      textInputAction: TextInputAction.next,
 
       style: GoogleFonts.cairo(),
-
+      validator: validator,
       decoration: InputDecoration(
         hintText: hint,
-
         hintStyle: GoogleFonts.cairo(color: Colors.grey.shade600),
 
         prefixIcon: Icon(icon, color: AppColors.mainblue),
+
+        filled: true,
+        fillColor: Colors.grey.shade50,
 
         contentPadding: const EdgeInsets.symmetric(
           vertical: 14,
           horizontal: 15,
         ),
 
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
       ),
     );
+  }
+
+  void _clearFields(CreateShipCubit cubit) {
+    cubit.pickupnameController.clear();
+    cubit.pickupphoneController.clear();
+    cubit.pickupaddressController.clear();
+    cubit.pickupstreetController.clear();
+    cubit.pickupbuildingController.clear();
+    cubit.pickupnotesController.clear();
   }
 }

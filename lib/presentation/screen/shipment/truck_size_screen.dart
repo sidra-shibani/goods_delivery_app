@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/Data/truck_data.dart';
-import 'package:goods_delivery_app/bussiness/shipment_cubit.dart/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
 import 'package:goods_delivery_app/datasource/model/truck_size_model.dart';
 import 'package:goods_delivery_app/presentation/screen/shipment/AdditionalInfoScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
