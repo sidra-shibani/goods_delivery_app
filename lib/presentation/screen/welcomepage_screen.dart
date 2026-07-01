@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
-import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/logIn_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyHomePage extends StatefulWidget {

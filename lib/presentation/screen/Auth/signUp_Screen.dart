@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:goods_delivery_app/bussiness/Auth_cubit/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/addpassword_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/logIn_screen.dart';
 
-import 'package:goods_delivery_app/presentation/screen/addpassword_screen.dart';
-import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SignupScreen extends StatefulWidget {

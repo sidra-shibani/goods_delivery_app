@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
-import 'package:goods_delivery_app/presentation/screen/addpassword_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/addpassword_screen.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
 class OtpScreen extends StatelessWidget {

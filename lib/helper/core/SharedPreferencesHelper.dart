@@ -4,6 +4,18 @@ class SharedPreferencesHelper {
   static const String _tokenKey = 'auth_token';
   static const String _nameKey = 'user_name';
 
+  static const String _phoneKey = 'user_phone';
+
+  static Future<void> savePhone(String phone) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_phoneKey, phone);
+  }
+
+  static Future<String?> getPhone() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_phoneKey);
+  }
+
   static Future<void> saveToken(String token) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);

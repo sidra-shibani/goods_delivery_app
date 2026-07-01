@@ -4,11 +4,12 @@ import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Auth_cubit/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
+
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
-import 'package:goods_delivery_app/presentation/screen/resetpassword_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/resetpassword_screen.dart';
 
-import 'package:goods_delivery_app/presentation/screen/signupFlow.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/signupFlow.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,12 +31,14 @@ class _LoginScreenState extends State<LoginScreen> {
           if (state is AuthLoadedLogin) {
             final token = state.response.data.accessToken;
             final username = state.response.data.username;
-
+            //final phone = state.response.data.phone;
             await SharedPreferencesHelper.saveToken(token);
 
             if (username != null) {
               await SharedPreferencesHelper.saveName(username);
+              //  await SharedPreferencesHelper.savePhone(phone);
             }
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => MainHomeScreen()),

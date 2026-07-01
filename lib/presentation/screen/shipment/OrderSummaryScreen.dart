@@ -199,189 +199,244 @@ class OrderSummaryScreen extends StatelessWidget {
 
                       const SizedBox(height: 12),
 
-                      Container(
-                        width: double.infinity,
-                        height: 100,
-                        padding: const EdgeInsets.all(16),
+                      //
+                      BlocBuilder<PriceCubit, ShipmentState>(
+                        builder: (context, state) {
+                          if (state is GetPriceLoaded) {
+                            final price = state.price.data;
 
-                        decoration: BoxDecoration(
-                          color: AppColors.lightyallow,
+                            final basicService =
+                                price.distanceCharge +
+                                price.startingFee +
+                                price.weightSurcharge;
 
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.yallow, width: 2),
-                        ),
-
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "200,000",
-                              style: GoogleFonts.cairo(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-
-                            Column(
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Text(
-                                  createShipCubit.trucksizeNameController.text,
+                                Container(
+                                  width: double.infinity,
+                                  height: 100,
+                                  padding: const EdgeInsets.all(16),
 
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.lightyallow,
+
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: AppColors.yallow,
+                                      width: 2,
+                                    ),
+                                  ),
+
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        ("${basicService.toStringAsFixed(2)} ل.س"),
+                                        style: GoogleFonts.cairo(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+
+                                      Column(
+                                        children: [
+                                          Text(
+                                            createShipCubit
+                                                .trucksizeNameController
+                                                .text,
+
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 15),
+                                          Text(
+                                            createShipCubit
+                                                        .truckTypeController
+                                                        .text ==
+                                                    "closed"
+                                                ? "مغلقة"
+                                                : createShipCubit
+                                                          .truckTypeController
+                                                          .text ==
+                                                      "open"
+                                                ? "مفتوحة"
+                                                : createShipCubit
+                                                          .truckTypeController
+                                                          .text ==
+                                                      "refrigerated"
+                                                ? "براد"
+                                                : createShipCubit
+                                                      .truckTypeController
+                                                      .text,
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                SizedBox(height: 15),
+                                const SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      createShipCubit.whoPays == "sender"
+                                          ? "المرسل"
+                                          : createShipCubit.whoPays ==
+                                                "receiver"
+                                          ? "المستلم"
+                                          : createShipCubit.whoPays,
+                                      style: GoogleFonts.cairo(
+                                        color: Colors.grey.shade700,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      "الدافع",
+                                      style: GoogleFonts.cairo(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
                                 Text(
-                                  createShipCubit.truckTypeController.text ==
-                                          "closed"
-                                      ? "مغلقة"
-                                      : createShipCubit
-                                                .truckTypeController
-                                                .text ==
-                                            "open"
-                                      ? "مفتوحة"
-                                      : createShipCubit
-                                                .truckTypeController
-                                                .text ==
-                                            "refrigerated"
-                                      ? "براد"
-                                      : createShipCubit
-                                            .truckTypeController
-                                            .text,
-                                  style: GoogleFonts.cairo(fontSize: 14),
+                                  "تفاصيل إضافية",
+                                  style: GoogleFonts.cairo(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 5),
+
+                                Divider(color: Colors.grey.shade300),
+                                Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: 30,
+                                          ),
+                                          child: Text(
+                                            ("${price.refrigeratedSurcharge} ل.س"),
+                                            textAlign: TextAlign.right,
+
+                                            style: GoogleFonts.cairo(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+
+                                        Text(
+                                          "براد",
+                                          textAlign: TextAlign.right,
+
+                                          style: GoogleFonts.cairo(
+                                            color: Colors.grey.shade700,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          ("${price.nightShippingSurcharge} ل.س"),
+                                          textAlign: TextAlign.right,
+
+                                          style: GoogleFonts.cairo(
+                                            color: Colors.grey.shade700,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: 0,
+                                          ),
+                                          child: Text(
+                                            "شحن ليلي",
+                                            textAlign: TextAlign.right,
+
+                                            style: GoogleFonts.cairo(
+                                              color: Colors.grey.shade700,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Container(
+                                      width: double.infinity,
+                                      height: 100,
+                                      padding: const EdgeInsets.all(16),
+
+                                      decoration: BoxDecoration(
+                                        color: AppColors.lightyallow,
+
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color: AppColors.yallow,
+                                          width: 2,
+                                        ),
+                                      ),
+
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "${state.price.data.totalPrice} ل.س",
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+
+                                          Text(
+                                            "المجموع الكلي",
+                                            style: GoogleFonts.cairo(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
-                            ),
-                          ],
-                        ),
-                      ),
+                            );
+                          }
 
-                      const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            createShipCubit.whoPays == "sender"
-                                ? "المرسل"
-                                : createShipCubit.whoPays == "receiver"
-                                ? "المستلم"
-                                : createShipCubit.whoPays,
-                            style: GoogleFonts.cairo(
-                              color: Colors.grey.shade700,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            "الدافع",
-                            style: GoogleFonts.cairo(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
+                          if (state is ShipLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
 
-                      const SizedBox(height: 20),
-                      Text(
-                        "تفاصيل إضافية",
-                        style: GoogleFonts.cairo(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
+                          return const SizedBox();
+                        },
                       ),
 
                       const SizedBox(height: 15),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30),
-                            child: Text(
-                              "100ل.س",
-                              textAlign: TextAlign.right,
-
-                              style: GoogleFonts.cairo(
-                                color: Colors.grey.shade700,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30),
-                            child: Text(
-                              "شحن ليلي",
-                              textAlign: TextAlign.right,
-
-                              style: GoogleFonts.cairo(
-                                color: Colors.grey.shade700,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      Divider(color: Colors.grey.shade300),
-
-                      const SizedBox(height: 15),
-
-                      Container(
-                        width: double.infinity,
-                        height: 100,
-                        padding: const EdgeInsets.all(16),
-
-                        decoration: BoxDecoration(
-                          color: AppColors.lightyallow,
-
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.yallow, width: 2),
-                        ),
-
-                        child: Row(
-                          children: [
-                            BlocBuilder<PriceCubit, ShipmentState>(
-                              builder: (context, state) {
-                                if (state is GetPriceLoaded) {
-                                  return Text(
-                                    "${state.price.data.estimatedPrice} ل.س",
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  );
-                                }
-
-                                if (state is ShipLoading) {
-                                  return const CircularProgressIndicator();
-                                }
-
-                                return Text(
-                                  "--",
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                );
-                              },
-                            ),
-                            const Spacer(),
-
-                            Text(
-                              "المجموع الكلي",
-                              style: GoogleFonts.cairo(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                 ),

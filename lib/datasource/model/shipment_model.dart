@@ -148,6 +148,7 @@ class Merchant {
 
 class Driver {
   final int id;
+  final int? userId;
   final String fullName;
   final String email;
   final String phoneNumber;
@@ -159,6 +160,7 @@ class Driver {
 
   Driver({
     required this.id,
+    this.userId,
     required this.fullName,
     required this.email,
     required this.phoneNumber,
@@ -172,6 +174,7 @@ class Driver {
   factory Driver.fromJson(Map<String, dynamic> json) {
     return Driver(
       id: json['id'] ?? 0,
+      userId: json['user_id'],
       fullName: json['full_name'] ?? 'غير محدد',
       email: json['email'] ?? '',
       phoneNumber: json['phone_number'] ?? '',
@@ -229,13 +232,21 @@ class RouteModel {
   factory RouteModel.fromJson(Map<String, dynamic> json) {
     return RouteModel(
       overviewPolyline: json['overview_polyline'] ?? '',
-      pickUpLat: double.tryParse(json['pick_up_lat'].toString()) ?? 0.0,
-      pickUpLng: double.tryParse(json['pick_up_lng'].toString()) ?? 0.0,
+      pickUpLat: double.tryParse(json['pickup_lat'].toString()) ?? 0.0,
+      pickUpLng: double.tryParse(json['pickup_lon'].toString()) ?? 0.0,
 
       deliveryLat: double.tryParse(json['delivery_lat'].toString()) ?? 0.0,
-      deliveryLng: double.tryParse(json['delivery_lng'].toString()) ?? 0.0,
+      deliveryLng: double.tryParse(json['delivery_lon'].toString()) ?? 0.0,
       pickUpCheckpointDetails: Checkpoint.fromJson(
-        json['pick_up_checkpoint_details'] ?? {},
+        json['pickup _checkpoint_details'] ??
+            json['pickup_checkpoint_details'] ??
+            (json.entries
+                .firstWhere(
+                  (e) =>
+                      e.key.replaceAll(' ', '') == 'pickup_checkpoint_details',
+                  orElse: () => const MapEntry('', {}),
+                )
+                .value),
       ),
 
       deliveryCheckpointDetails: Checkpoint.fromJson(
@@ -249,11 +260,11 @@ class RouteModel {
   Map<String, dynamic> toJson() {
     return {
       "overview_polyline": overviewPolyline,
-      "pick_up_lat": pickUpLat,
-      "pick_up_lng": pickUpLng,
-      "pick_up_checkpoint_details": pickUpCheckpointDetails.toJson(),
+      "pickup_lat": pickUpLat,
+      "pickup_lon": pickUpLng,
+      "pickup _checkpoint_details": pickUpCheckpointDetails.toJson(),
       "delivery_lat": deliveryLat,
-      "delivery_lng": deliveryLng,
+      "delivery_lon": deliveryLng,
       "delivery_checkpoint_details": deliveryCheckpointDetails.toJson(),
       "distance": distance,
       "duration_minutes": durationMinutes,
@@ -378,9 +389,9 @@ class RouteRequest {
   Map<String, dynamic> toJson() {
     return {
       "overview_polyline": overviewPolyline,
-      "pick_up_lat": pickUpLat,
-      "pick_up_lon": pickUpLng,
-      "pick_up_checkpoint_details": pickUpCheckpointDetails.toJson(),
+      "pickup_lat": pickUpLat,
+      "pickup_lon": pickUpLng,
+      "pickup _checkpoint_details": pickUpCheckpointDetails.toJson(),
       "delivery_lat": deliveryLat,
       "delivery_lon": deliveryLng,
       "delivery_checkpoint_details": deliveryCheckpointDetails.toJson(),
@@ -475,13 +486,43 @@ class ShipmentPriceResponse {
 }
 
 class ShipmentPriceData {
-  final double estimatedPrice;
+  final double distanceCharge;
+  final double totalPrice;
+  final double startingFee;
+  final double refrigeratedSurcharge;
+  final double weightSurcharge;
+  final double nightShippingSurcharge;
 
-  ShipmentPriceData({required this.estimatedPrice});
+  ShipmentPriceData({
+    required this.distanceCharge,
+    required this.totalPrice,
+    required this.startingFee,
+    required this.refrigeratedSurcharge,
+    required this.weightSurcharge,
+    required this.nightShippingSurcharge,
+  });
 
   factory ShipmentPriceData.fromJson(Map<String, dynamic> json) {
     return ShipmentPriceData(
-      estimatedPrice: (json['estimated_price'] as num).toDouble(),
+      distanceCharge: (json['distance_charge'] as num?)?.toDouble() ?? 0.0,
+      totalPrice: (json['total_price'] as num?)?.toDouble() ?? 0.0,
+      startingFee: (json['starting_fee'] as num?)?.toDouble() ?? 0.0,
+      refrigeratedSurcharge:
+          (json['refrigerated_surcharge'] as num?)?.toDouble() ?? 0.0,
+      weightSurcharge: (json['weight_surcharge'] as num?)?.toDouble() ?? 0.0,
+      nightShippingSurcharge:
+          (json['night_shipping_surcharge'] as num?)?.toDouble() ?? 0.0,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'distance_charge': distanceCharge,
+      'total_price': totalPrice,
+      'starting_fee': startingFee,
+      'refrigerated_surcharge': refrigeratedSurcharge,
+      'weight_surcharge': weightSurcharge,
+      'night_shipping_surcharge': nightShippingSurcharge,
+    };
   }
 }

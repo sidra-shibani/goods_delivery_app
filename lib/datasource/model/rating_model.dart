@@ -35,9 +35,9 @@ class RatingSummaryData {
 
   factory RatingSummaryData.fromJson(Map<String, dynamic> json) {
     return RatingSummaryData(
-      userId: json['user_id'] ?? 0,
-      averageRating: (json['average_rating'] ?? 0).toDouble(),
-      ratingsCount: json['ratings_count'] ?? 0,
+      userId: (json['user_id'] ?? 0) as int,
+      averageRating: (json['average_rating'] as num?)?.toDouble() ?? 0.0,
+      ratingsCount: (json['ratings_count'] ?? 0) as int,
     );
   }
 
@@ -79,7 +79,7 @@ class RatingData {
   final UserRate rater;
   final int shipmentId;
   final int rating;
-  final String comment;
+  final String? comment; // ✅ مهم
   final String createdAt;
 
   RatingData({
@@ -87,17 +87,17 @@ class RatingData {
     required this.rater,
     required this.shipmentId,
     required this.rating,
-    required this.comment,
+    this.comment,
     required this.createdAt,
   });
 
   factory RatingData.fromJson(Map<String, dynamic> json) {
     return RatingData(
-      ratee: UserRate.fromJson(json['ratee']),
-      rater: UserRate.fromJson(json['rater']),
-      shipmentId: json['shipment_id'] ?? 0,
-      rating: json['rating'] ?? 0,
-      comment: json['comment'] ?? '',
+      ratee: UserRate.fromJson(json['ratee'] ?? {}),
+      rater: UserRate.fromJson(json['rater'] ?? {}),
+      shipmentId: (json['shipment_id'] ?? 0) as int,
+      rating: (json['rating'] ?? 0) as int,
+      comment: json['comment'], // ممكن null
       createdAt: json['created_at'] ?? '',
     );
   }
@@ -133,7 +133,7 @@ class UserRate {
 
   factory UserRate.fromJson(Map<String, dynamic> json) {
     return UserRate(
-      id: json['id'] ?? 0,
+      id: (json['id'] ?? 0) as int,
       fullName: json['full_name'] ?? '',
       email: json['email'] ?? '',
       phoneNumber: json['phone_number'] ?? '',
@@ -196,7 +196,7 @@ class DriverProfile {
   final String gender;
   final String vehicleType;
   final String vehicleSize;
-  final int vehicleCapacityKg;
+  final double vehicleCapacityKg;
   final String? description;
 
   DriverProfile({

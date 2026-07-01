@@ -5,8 +5,7 @@ import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Auth_cubit/signUp_cubit.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/model/register_model.dart';
-
-import 'package:goods_delivery_app/presentation/screen/logIn_screen.dart';
+import 'package:goods_delivery_app/presentation/screen/Auth/logIn_screen.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 

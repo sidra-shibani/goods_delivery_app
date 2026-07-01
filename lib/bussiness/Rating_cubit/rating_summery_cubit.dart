@@ -14,6 +14,7 @@ class GetRatingSummeryCubit extends Cubit<RatingState> {
 
     final response = await repository.getRatingSum(id);
     print(response);
+    print("FETCH DRIVER RATING ID = $id");
     response.fold((error) {
       emit(RatingError(error.message));
     }, (data) => emit(GetRatingSummeryLoaded(data)));

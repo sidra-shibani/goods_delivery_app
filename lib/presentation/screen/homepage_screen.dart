@@ -5,7 +5,8 @@ import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.d
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
-import 'package:goods_delivery_app/presentation/screen/TripTrackingScreen.dart';
+import 'package:goods_delivery_app/presentation/screen/Tracking/TripTrackingScreen.dart';
+
 import 'package:goods_delivery_app/presentation/widget/OrderDetailsBottomSheet.dart';
 import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
 import 'package:goods_delivery_app/presentation/widget/orderCard_widget.dart';
@@ -316,6 +317,8 @@ class HomePage extends StatelessWidget {
                                                         shipment.driver?.id ??
                                                             0,
                                                       ),
+                                                  //  child:
+                                                  // DriverTrackingTestScreen(),
                                                   child: TripTrackingScreen(
                                                     shipment: shipment,
                                                   ),
@@ -582,20 +585,11 @@ class _OrdersPageState extends State<OrdersPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu, color: Color(0xff4A5D8F)),
-          ),
-          const Spacer(),
           Text(
             "طلباتي",
             style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.w700),
-          ),
-          const Spacer(),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications, color: Color(0xff4A5D8F)),
           ),
         ],
       ),
