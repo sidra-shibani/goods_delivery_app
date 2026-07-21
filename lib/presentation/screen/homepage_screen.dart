@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
+import 'package:goods_delivery_app/datasource/services/tracking_socket_service.dart';
+import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
+import 'package:goods_delivery_app/helper/core/service_locator.dart';
 import 'package:goods_delivery_app/presentation/screen/Tracking/TripTrackingScreen.dart';
 
 import 'package:goods_delivery_app/presentation/widget/OrderDetailsBottomSheet.dart';
@@ -69,9 +73,14 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -308,17 +317,40 @@ class HomePage extends StatelessWidget {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) => BlocProvider(
-                                                  create: (context) =>
-                                                      GetRatingSummeryCubit(
-                                                        context
-                                                            .read<RatingRepo>(),
-                                                      )..fetchRatingSummery(
-                                                        shipment.driver?.id ??
-                                                            0,
-                                                      ),
-                                                  //  child:
-                                                  // DriverTrackingTestScreen(),
+                                                builder: (_) => MultiBlocProvider(
+                                                  providers: [
+                                                    BlocProvider(
+                                                      create: (context) =>
+                                                          GetRatingSummeryCubit(
+                                                            context
+                                                                .read<
+                                                                  RatingRepo
+                                                                >(),
+                                                          )..fetchRatingSummery(
+                                                            shipment
+                                                                    .driver
+                                                                    ?.id ??
+                                                                0,
+                                                          ),
+
+                                                      //  child:
+                                                      // DriverTrackingTestScreen(),
+                                                    ),
+                                                    BlocProvider(
+                                                      create: (context) {
+                                                        return TrackingCubit(
+                                                          sl<
+                                                            TrackingSocketService
+                                                          >(),
+                                                        )..startTracking(
+                                                          shipmentId:
+                                                              shipment.id,
+                                                        );
+                                                      },
+
+                                                      child: Container(),
+                                                    ),
+                                                  ],
                                                   child: TripTrackingScreen(
                                                     shipment: shipment,
                                                   ),

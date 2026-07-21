@@ -10,20 +10,33 @@ import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
+import 'package:goods_delivery_app/datasource/services/reverb_client.dart';
 
 import 'package:goods_delivery_app/datasource/webserver/Auth_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/rating_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/shipment_server.dart';
+import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
+import 'package:goods_delivery_app/helper/core/service_locator.dart';
+import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 
 import 'package:goods_delivery_app/presentation/screen/welcomepage_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await initServiceLocator();
+  await sl<ReverbClient>().init();
+
+  final bool isLoggedIn = await SharedPreferencesHelper.getToken() == null
+      ? false
+      : true;
+
+  runApp(MyApp(isLoggedIn: isLoggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.isLoggedIn});
+  final bool isLoggedIn;
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +79,7 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: MyHomePage(),
+          home: isLoggedIn ? MainHomeScreen() : MyHomePage(),
         ),
       ),
     );

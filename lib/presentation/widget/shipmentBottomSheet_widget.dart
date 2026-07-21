@@ -177,7 +177,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                           setState(() {
                             pickupLocationSelected = true;
                           });
-                          ScaffoldMessenger.of(rootContext).showSnackBar(
+                          ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("تم حفظ موقع التحميل"),
                             ),
@@ -263,7 +263,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                             deliveryLocationSelected = true;
                           });
 
-                          ScaffoldMessenger.of(rootContext).showSnackBar(
+                          ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text("تم حفظ موقع الاستلام"),
                             ),

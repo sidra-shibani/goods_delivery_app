@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ReverbClient {
   ReverbClient._();
@@ -14,22 +14,19 @@ class ReverbClient {
     if (_client == null) {
       throw Exception("ReverbClient not initialized");
     }
+
     return _client!;
   }
 
   Future<void> init() async {
     if (_initialized) return;
-
-    final host = dotenv.env['REVERB_HOST']!;
-    final port = int.parse(dotenv.env['REVERB_PORT']!);
-    final key = dotenv.env['REVERB_APP_KEY']!;
-    final scheme = dotenv.env['REVERB_SCHEME'] ?? 'http';
+    log('Start initializing client');
 
     final options = PusherChannelsOptions.fromHost(
-      host: host,
-      port: port,
-      key: key,
-      scheme: scheme,
+      host: '10.0.2.2',
+      port: 8080,
+      key: 'ykvdemrkcwgoemelrstb',
+      scheme: 'ws',
       shouldSupplyMetadataQueries: true,
       metadata: PusherChannelsOptionsMetadata.byDefault(),
     );
@@ -42,9 +39,17 @@ class ReverbClient {
       },
     );
 
-    _client!.onConnectionEstablished.listen((event) {
-      debugPrint("✅ Connected to Reverb");
-    });
+    _client!.onConnectionEstablished.listen(
+      onError: (e) {
+        log('Reverb connection error');
+      },
+      onDone: () {
+        log('Reverb connected');
+      },
+      (event) {
+        debugPrint("✅ Connected to Reverb");
+      },
+    );
 
     await _client!.connect();
     _initialized = true;

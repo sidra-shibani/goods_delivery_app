@@ -130,9 +130,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           return "يرجى إدخال رقم الهاتف";
                                         }
 
-                                        if (value.length < 9) {
-                                          return "رقم الهاتف غير صالح";
-                                        }
+                                        // if (value.length < 9) {
+                                        //   return "رقم الهاتف غير صالح";
+                                        // }
 
                                         return null;
                                       },
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             if (cubit.formkey.currentState!
                                                 .validate()) {
                                               cubit.login(
-                                                "+963${cubit.phoneController.text.trim()}",
+                                                "${cubit.phoneController.text.trim()}",
 
                                                 cubit.passwordController.text
                                                     .trim(),

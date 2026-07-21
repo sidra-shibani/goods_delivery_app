@@ -1,8 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/Rating_state.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_state.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/model/rating_model.dart';
 import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
@@ -160,23 +164,36 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
           Container(
             height: 500,
             width: double.maxFinite,
-            child: GoogleMap(
-              key: const ValueKey("google_map"),
-              mapType: MapType.normal,
-              initialCameraPosition: const CameraPosition(
-                target: LatLng(35.0, 38.0),
-                zoom: 6,
-              ),
-              markers: markers,
-              polylines: polylines,
-
-              onMapCreated: (controller) {
-                mapController = controller;
-
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  _fitBounds();
-                });
+            child: BlocListener<TrackingCubit, TrackingState>(
+              listener: (context, state) {
+                if (state is TrackingConnecting) {
+                  log('connecting');
+                }
+                if (state is TrackingLocationUpdated) {
+                  log(
+                    '${state.position.latitude} , ${state.position.longitude}',
+                  );
+                }
               },
+              child: GoogleMap(
+                key: const ValueKey("google_map"),
+                mapType: MapType.normal,
+                initialCameraPosition: const CameraPosition(
+                  target: LatLng(35.0, 38.0),
+                  zoom: 6,
+                ),
+                markers: markers,
+
+                polylines: polylines,
+
+                onMapCreated: (controller) {
+                  mapController = controller;
+
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    _fitBounds();
+                  });
+                },
+              ),
             ),
           ),
 
