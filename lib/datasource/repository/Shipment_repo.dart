@@ -12,17 +12,16 @@ class ShipmentRepo {
 
   Future<Either<ApiError, ShipmentResponse>> createShipment(
     ShipmentRequest model,
+    List<File> images,
   ) async {
     try {
-      final response = await service.createShipment(model);
-
+      final response = await service.createShipment(model, images);
       return Right(ShipmentResponse.fromJson(response.data));
     } on DioException catch (dioErr) {
       final message =
           dioErr.response?.data['message'] ??
           dioErr.message ??
           'Dio network error';
-
       return Left(
         ApiError(
           statusCode: dioErr.response?.statusCode ?? 0,

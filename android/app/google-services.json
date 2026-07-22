@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "860697077653",
+    "project_id": "goods-delivery-app-c7fe2",
+    "storage_bucket": "goods-delivery-app-c7fe2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860697077653:android:04a113609000e6762eb89c",
+        "android_client_info": {
+          "package_name": "com.example.goods_delivery_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBEx4bLxfHURVDu4euSd1_wBsB8zXJR6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

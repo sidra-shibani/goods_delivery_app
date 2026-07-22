@@ -2,41 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
+import 'package:goods_delivery_app/datasource/repository/Profile_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
 import 'package:goods_delivery_app/datasource/services/reverb_client.dart';
 
 import 'package:goods_delivery_app/datasource/webserver/Auth_server.dart';
+import 'package:goods_delivery_app/datasource/webserver/profile_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/rating_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/shipment_server.dart';
-import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
-import 'package:goods_delivery_app/helper/core/service_locator.dart';
-import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 
-import 'package:goods_delivery_app/presentation/screen/welcomepage_screen.dart';
+import 'package:goods_delivery_app/helper/core/service_locator.dart';
+import 'package:goods_delivery_app/presentation/screen/Splash/splash_screen.dart';
+
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initServiceLocator();
-  await sl<ReverbClient>().init();
+  //await sl<ReverbClient>().init();
 
-  final bool isLoggedIn = await SharedPreferencesHelper.getToken() == null
-      ? false
-      : true;
-
-  runApp(MyApp(isLoggedIn: isLoggedIn));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.isLoggedIn});
-  final bool isLoggedIn;
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +54,11 @@ class MyApp extends StatelessWidget {
         Provider<RatingRepo>(
           create: (context) => RatingRepo(context.read<RatingServer>()),
         ),
+        //Profile
+        Provider<ProfileServer>(create: (_) => ProfileServer()),
+        Provider<ProfileRepo>(
+          create: (context) => ProfileRepo(context.read<ProfileServer>()),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -76,10 +78,15 @@ class MyApp extends StatelessWidget {
           BlocProvider<GiveratingCubit>(
             create: (context) => GiveratingCubit(context.read<RatingRepo>()),
           ),
+
+          BlocProvider<ProfileCubit>(
+            create: (context) =>
+                ProfileCubit(context.read<ProfileRepo>())..fetchME(),
+          ),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: isLoggedIn ? MainHomeScreen() : MyHomePage(),
+          home: SplashScreen(),
         ),
       ),
     );

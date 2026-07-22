@@ -330,7 +330,7 @@ class OrderSummaryScreen extends StatelessWidget {
                                             right: 30,
                                           ),
                                           child: Text(
-                                            ("${price.refrigeratedSurcharge} ل.س"),
+                                            ("${price.refrigeratedSurcharge.toStringAsFixed(0)} ل.س"),
                                             textAlign: TextAlign.right,
 
                                             style: GoogleFonts.cairo(
@@ -357,7 +357,7 @@ class OrderSummaryScreen extends StatelessWidget {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          ("${price.nightShippingSurcharge} ل.س"),
+                                          ("${price.nightShippingSurcharge.toStringAsFixed(0)} ل.س"),
                                           textAlign: TextAlign.right,
 
                                           style: GoogleFonts.cairo(
@@ -403,7 +403,7 @@ class OrderSummaryScreen extends StatelessWidget {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            "${state.price.data.totalPrice} ل.س",
+                                            "${state.price.data.totalPrice.toStringAsFixed(0)} ل.س",
                                             style: GoogleFonts.cairo(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
@@ -467,6 +467,9 @@ class OrderSummaryScreen extends StatelessWidget {
 
                     child: ElevatedButton(
                       onPressed: () {
+                        print(createShipCubit.polyline);
+                        print(createShipCubit.distance);
+                        print(createShipCubit.duration);
                         final request = ShipmentRequest(
                           goodsType: createShipCubit.goodsTypeController.text,
 

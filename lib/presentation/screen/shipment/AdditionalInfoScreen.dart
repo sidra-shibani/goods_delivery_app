@@ -415,51 +415,87 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-
                               const SizedBox(height: 10),
 
-                              GestureDetector(
-                                onTap: () {
-                                  // Image Picker Here
-                                },
+                              BlocBuilder<CreateShipCubit, ShipmentState>(
+                                builder: (context, state) {
+                                  final cubit = context.read<CreateShipCubit>();
 
-                                child: Container(
-                                  width: double.infinity,
-                                  height: 180,
-
-                                  decoration: BoxDecoration(
-                                    color: AppColors.white,
-
-                                    border: Border.all(
-                                      color: AppColors.medgray,
-                                      width: 1.5,
-                                    ),
-
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-
+                                  return Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
                                     children: [
-                                      Icon(
-                                        Icons.add_circle_outline,
-                                        color: AppColors.yallow,
-                                        size: 55,
+                                      ...List.generate(
+                                        cubit.selectedImages.length,
+                                        (index) {
+                                          final file =
+                                              cubit.selectedImages[index];
+                                          return Stack(
+                                            clipBehavior: Clip.none,
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.file(
+                                                  file,
+                                                  width: 90,
+                                                  height: 90,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: -6,
+                                                right: -6,
+                                                child: GestureDetector(
+                                                  onTap: () =>
+                                                      cubit.removeImage(index),
+                                                  child: Container(
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                          color: Colors.red,
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                    padding:
+                                                        const EdgeInsets.all(3),
+                                                    child: const Icon(
+                                                      Icons.close,
+                                                      size: 14,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       ),
 
-                                      const SizedBox(height: 12),
-
-                                      Text(
-                                        "إضافة صورة",
-                                        style: GoogleFonts.cairo(
-                                          color: AppColors.yallow,
-                                          fontWeight: FontWeight.bold,
+                                      GestureDetector(
+                                        onTap: () => cubit.pickImages(),
+                                        child: Container(
+                                          width: 90,
+                                          height: 90,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.white,
+                                            border: Border.all(
+                                              color: AppColors.medgray,
+                                              width: 1.5,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.add_circle_outline,
+                                            color: AppColors.yallow,
+                                            size: 32,
+                                          ),
                                         ),
                                       ),
                                     ],
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -496,10 +532,24 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
 
                             child: ElevatedButton(
                               onPressed: () {
+                                if (createShipCubit.distance == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "يرجى تحديد موقعي التحميل والتسليم أولاً",
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
                                 final request = CalculatePriceRequest(
                                   scheduledPickupAt:
                                       pricecubit.scheduleController.text,
-                                  distance: 75,
+
+                                  distance: double.parse(
+                                    (createShipCubit.distance ?? 0)
+                                        .toStringAsFixed(2),
+                                  ),
                                   weight:
                                       double.tryParse(
                                         pricecubit.weightController.text,

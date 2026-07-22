@@ -111,8 +111,14 @@ class OrderDetailsBottomSheet extends StatelessWidget {
                             separatorBuilder: (_, __) =>
                                 const SizedBox(width: 10),
                             itemBuilder: (context, index) {
+                              final rawUrl = shipment.mediaUrls![index];
+
                               final imageUrl =
-                                  "${ApiConstants.imageBaseUrl}${shipment.mediaUrls![index]}";
+                                  rawUrl.startsWith('http://') ||
+                                      rawUrl.startsWith('https://')
+                                  ? rawUrl
+                                  : "${ApiConstants.imageBaseUrl}$rawUrl";
+
                               print(imageUrl);
                               return ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
@@ -148,7 +154,7 @@ class OrderDetailsBottomSheet extends StatelessWidget {
 
                       _infoRow("نوع الشاحنة", shipment.vehicleType),
 
-                      _infoRow("سعة الشاحنة", "${shipment.capacityKg} كغ"),
+                      _infoRow("سعة الشاحنة", "${shipment.vehicleSize} كغ"),
 
                       _infoRow("وزن الحمولة", "${shipment.weight} كغ"),
                     ],

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'dart:developer';
@@ -9,17 +7,17 @@ import 'package:goods_delivery_app/const/strings.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ShipmentServer {
+class ProfileServer {
   late Dio dio;
 
-  ShipmentServer() {
+  ProfileServer() {
     dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 66),
         responseType: ResponseType.json,
-        followRedirects: false,
+        followRedirects: true,
         headers: {
           "Accept": "application/json",
           // "Content-Type": "application/json",
@@ -62,22 +60,7 @@ class ShipmentServer {
     );
   }
 
-  Future<Response> createShipment(
-    ShipmentRequest model,
-    List<File> images,
-  ) async {
-    final formData = await model.toFormData(images);
-    return dio.post('/merchant/shipments', data: formData);
-  }
-
-  Future<Response> getMyshipments() {
-    return dio.get('/merchant/shipments');
-  }
-
-  Future<Response> getShipmentPrice(CalculatePriceRequest model) {
-    return dio.get(
-      '/merchant/shipments/calculate-price',
-      queryParameters: model.toJson(),
-    );
+  Future<Response> getMyProfile() {
+    return dio.get('/me');
   }
 }

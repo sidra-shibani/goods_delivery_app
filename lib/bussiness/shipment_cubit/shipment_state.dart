@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 
 abstract class ShipmentState {}
@@ -30,3 +32,8 @@ class GetPriceLoaded extends ShipmentState {
 }
 
 class RouteCalculatedState extends ShipmentState {}
+
+class MediaUpdated extends ShipmentState {
+  final List<File> images;
+  MediaUpdated(this.images);
+}

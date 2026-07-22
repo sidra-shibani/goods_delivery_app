@@ -6,6 +6,18 @@ class SharedPreferencesHelper {
 
   static const String _phoneKey = 'user_phone';
 
+  static const String onboardingKey = "onboarding_finished";
+
+  static Future<void> completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(onboardingKey, true);
+  }
+
+  static Future<bool> isOnboardingFinished() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(onboardingKey) ?? false;
+  }
+
   static Future<void> savePhone(String phone) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(_phoneKey, phone);

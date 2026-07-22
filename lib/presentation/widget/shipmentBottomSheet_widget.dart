@@ -244,7 +244,7 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                               .longitude
                               .toString();
 
-                          await createshipCubit.getRouteData(
+                          final success = await createshipCubit.getRouteData(
                             pickLat: double.parse(
                               createshipCubit.pickuplatController.text,
                             ),
@@ -255,19 +255,26 @@ class _CreateShipmentBottomSheetState extends State<CreateShipmentBottomSheet> {
                             delLng: location.longitude,
                           );
 
-                          print("Polyline = ${createshipCubit.polyline}");
-                          print("Distance = ${createshipCubit.distance}");
-                          print("Duration = ${createshipCubit.duration}");
+                          if (!mounted) return;
 
-                          setState(() {
-                            deliveryLocationSelected = true;
-                          });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("تم حفظ موقع الاستلام"),
-                            ),
-                          );
+                          if (success) {
+                            setState(() {
+                              deliveryLocationSelected = true;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("تم حفظ موقع الاستلام"),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "فشل حساب المسار، حاول مجدداً بعد التأكد من الاتصال",
+                                ),
+                              ),
+                            );
+                          }
                         }
                       },
 

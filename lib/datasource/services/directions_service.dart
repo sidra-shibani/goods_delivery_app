@@ -10,15 +10,16 @@ class DirectionsService {
     required double destLat,
     required double destLng,
   }) async {
+    print("getRouteData called");
     final url =
         "https://maps.googleapis.com/maps/api/directions/json"
         "?origin=$originLat,$originLng"
         "&destination=$destLat,$destLng"
         "&mode=driving"
         "&key=$apiKey";
-
+    print(url);
     final response = await http.get(Uri.parse(url));
-
+    print(response.body);
     final data = jsonDecode(response.body);
 
     if (data["status"] != "OK") {

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/const/colors.dart';
+import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/presentation/screen/Auth/logIn_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class OnBoardingPage extends StatefulWidget {
+  const OnBoardingPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<OnBoardingPage> createState() => _OnBoardingPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _OnBoardingPageState extends State<OnBoardingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,10 +79,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(height: 10),
 
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await SharedPreferencesHelper.completeOnboarding();
+
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        MaterialPageRoute(builder: (_) => LoginScreen()),
                       );
                     },
                     style: ElevatedButton.styleFrom(

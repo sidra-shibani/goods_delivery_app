@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_state.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart';
 
@@ -10,6 +12,7 @@ import 'package:goods_delivery_app/datasource/services/tracking_socket_service.d
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/helper/core/service_locator.dart';
 import 'package:goods_delivery_app/presentation/screen/Tracking/TripTrackingScreen.dart';
+import 'package:goods_delivery_app/presentation/screen/personalnfo_Screen.dart';
 
 import 'package:goods_delivery_app/presentation/widget/OrderDetailsBottomSheet.dart';
 import 'package:goods_delivery_app/presentation/widget/custom_drawer.dart';
@@ -635,12 +638,356 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Center(
-        child: Text(
-          "الملف الشخصي",
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ===== الهيدر المنحني =====
+                SizedBox(
+                  height: 210,
+                  child: ClipPath(
+                    clipper: _HeaderCurveClipper(),
+                    child: Container(
+                      color: AppColors.lightblue,
+                      child: SafeArea(
+                        bottom: false,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
 
-          style: GoogleFonts.cairo(fontSize: 28, fontWeight: FontWeight.bold),
+                const SizedBox(height: 68),
+
+                // ===== الاسم والبيانات =====
+                BlocBuilder<ProfileCubit, ProfileState>(
+                  builder: (context, state) {
+                    if (state is GetProfileLoaded) {
+                      final myPro = state.me.data;
+
+                      return Column(
+                        children: [
+                          Text(
+                            myPro.fullName,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.black,
+                            ),
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          Text(
+                            "${myPro.email} | ${myPro.phoneNumber}",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: 13,
+                              color: AppColors.naturalgray,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+
+                    if (state is ProfileLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (state is ProfileError) {
+                      return Center(
+                        child: Text(state.message, style: GoogleFonts.cairo()),
+                      );
+                    }
+
+                    // الحالة الافتراضية
+                    return const SizedBox();
+                  },
+                ),
+
+                const SizedBox(height: 22),
+
+                // ===== المحتوى =====
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Column(
+                      children: [
+                        _SectionCard(
+                          children: [
+                            _SettingRow(
+                              icon: Icons.article_outlined,
+                              label: "معلومات شخصية",
+                              trailingText: null,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const PersonalInfoScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                            const _RowDivider(),
+                            _SettingRow(
+                              icon: Icons.notifications_none,
+                              label: "الاشعارات",
+                              trailingText: "تفعيل",
+                              onTap: () {},
+                            ),
+                            const _RowDivider(),
+                            _SettingRow(
+                              icon: Icons.translate,
+                              label: "اللغة",
+                              trailingText: "العربية",
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        _SectionCard(
+                          children: [
+                            _SettingRow(
+                              icon: Icons.badge_outlined,
+                              label: "الأمان",
+                              trailingText: null,
+                              onTap: () {},
+                            ),
+                            const _RowDivider(),
+                            _SettingRow(
+                              icon: Icons.wb_sunny_outlined,
+                              label: "الوضع",
+                              trailingText: "نهاري",
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        _SectionCard(
+                          children: [
+                            _SettingRow(
+                              icon: Icons.support_agent_outlined,
+                              label: "Help & Support",
+                              trailingText: null,
+                              ltr: true,
+                              onTap: () {},
+                            ),
+                            const _RowDivider(),
+                            _SettingRow(
+                              icon: Icons.chat_bubble_outline,
+                              label: "Contact us",
+                              trailingText: null,
+                              ltr: true,
+                              onTap: () {},
+                            ),
+                            const _RowDivider(),
+                            _SettingRow(
+                              icon: Icons.lock_outline,
+                              label: "Privacy policy",
+                              trailingText: null,
+                              ltr: true,
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 90),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // ===== الصورة الشخصية =====
+            Positioned(
+              top: 155,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: 96,
+                      height: 96,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFCFE3F5),
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: ClipOval(
+                        child: Image.network(
+                          // استبدلها بـ Image.asset("assets/images/avatar.png")
+                          "https://api.dicebear.com/7.x/adventurer/png?seed=Laiba",
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.person,
+                            size: 50,
+                            color: AppColors.mainblue,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -2,
+                      right: -2,
+                      child: Container(
+                        width: 26,
+                        height: 26,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 4,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.edit,
+                          size: 14,
+                          color: AppColors.naturalgray,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderCurveClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height * 0.72);
+    path.quadraticBezierTo(
+      size.width / 2,
+      size.height * 0.34,
+      size.width,
+      size.height * 0.72,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+// ---------------------------------------------------------------------------
+// بطاقة قسم
+// ---------------------------------------------------------------------------
+class _SectionCard extends StatelessWidget {
+  final List<Widget> children;
+  const _SectionCard({required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.medgray),
+      ),
+      child: Column(children: children),
+    );
+  }
+}
+
+class _RowDivider extends StatelessWidget {
+  const _RowDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: 16,
+      endIndent: 16,
+      color: Colors.grey.shade200,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// صف إعداد واحد
+// ---------------------------------------------------------------------------
+class _SettingRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String? trailingText;
+  final VoidCallback onTap;
+  final bool ltr;
+
+  const _SettingRow({
+    required this.icon,
+    required this.label,
+    required this.trailingText,
+    required this.onTap,
+    this.ltr = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          textDirection: ltr ? TextDirection.ltr : TextDirection.rtl,
+          children: [
+            Icon(icon, size: 20, color: AppColors.medgray),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.cairo(
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.black,
+                ),
+              ),
+            ),
+            if (trailingText != null)
+              Text(
+                trailingText!,
+                style: GoogleFonts.cairo(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.yallow,
+                ),
+              ),
+          ],
         ),
       ),
     );

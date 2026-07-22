@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (state is AuthLoadedLogin) {
             final token = state.response.data.accessToken;
             final username = state.response.data.username;
-            //final phone = state.response.data.phone;
+
             await SharedPreferencesHelper.saveToken(token);
 
             if (username != null) {

@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
+
 class ShipmentResponse {
   final String status;
   final String message;
@@ -21,8 +25,9 @@ class ShipmentResponse {
 class ShipmentData {
   final int id;
   final String goodsType;
+  final String vehicleSize;
   final String vehicleType;
-  final int capacityKg;
+
   final double weight;
   final bool nightShipping;
   final String whoPays;
@@ -44,9 +49,10 @@ class ShipmentData {
 
   ShipmentData({
     required this.id,
+    required this.vehicleSize,
     required this.goodsType,
     required this.vehicleType,
-    required this.capacityKg,
+
     required this.weight,
     required this.nightShipping,
     required this.whoPays,
@@ -66,9 +72,10 @@ class ShipmentData {
   factory ShipmentData.fromJson(Map<String, dynamic> json) {
     return ShipmentData(
       id: json['id'] ?? 0,
+      vehicleSize: json['vehicle_size'] ?? '',
       goodsType: json['goods_type'] ?? '',
       vehicleType: json['vehicle_type'] ?? '',
-      capacityKg: json['capacity_kg'] ?? 0,
+
       weight: (json['weight'] ?? 0).toDouble(),
       nightShipping: json['night_shipping'] ?? false,
       whoPays: json['who_pays'] ?? '',
@@ -89,9 +96,10 @@ class ShipmentData {
   Map<String, dynamic> toJson() {
     return {
       "id": id,
+      "vehicle_size": vehicleSize,
       "goods_type": goodsType,
       "vehicle_type": vehicleType,
-      "capacity_kg": capacityKg,
+
       "weight": weight,
       "night_shipping": nightShipping,
       "who_pays": whoPays,
@@ -116,9 +124,13 @@ class Merchant {
   final String email;
   final String phoneNumber;
   final String address;
+  final int uid;
+  final String profilePictureUrl;
 
   Merchant({
     required this.id,
+    required this.uid,
+    required this.profilePictureUrl,
     required this.fullName,
     required this.email,
     required this.phoneNumber,
@@ -127,6 +139,8 @@ class Merchant {
 
   factory Merchant.fromJson(Map<String, dynamic> json) {
     return Merchant(
+      uid: json['uid'] ?? 0,
+      profilePictureUrl: json['profile_picture_url'] ?? '',
       id: json['id'] ?? 0,
       fullName: json['full_name'] ?? '',
       email: json['email'] ?? '',
@@ -138,6 +152,8 @@ class Merchant {
   Map<String, dynamic> toJson() {
     return {
       "id": id,
+      "uid": uid,
+      "profile_picture_url": profilePictureUrl,
       "full_name": fullName,
       "email": email,
       "phone_number": phoneNumber,
@@ -148,7 +164,7 @@ class Merchant {
 
 class Driver {
   final int id;
-  final int? userId;
+  final int userId;
   final String fullName;
   final String email;
   final String phoneNumber;
@@ -160,7 +176,7 @@ class Driver {
 
   Driver({
     required this.id,
-    this.userId,
+    required this.userId,
     required this.fullName,
     required this.email,
     required this.phoneNumber,
@@ -174,7 +190,7 @@ class Driver {
   factory Driver.fromJson(Map<String, dynamic> json) {
     return Driver(
       id: json['id'] ?? 0,
-      userId: json['user_id'],
+      userId: json['uid'],
       fullName: json['full_name'] ?? 'غير محدد',
       email: json['email'] ?? '',
       phoneNumber: json['phone_number'] ?? '',
@@ -189,6 +205,7 @@ class Driver {
   Map<String, dynamic> toJson() {
     return {
       "id": id,
+      "uid": userId,
       "full_name": fullName,
       "email": email,
       "phone_number": phoneNumber,
@@ -238,15 +255,7 @@ class RouteModel {
       deliveryLat: double.tryParse(json['delivery_lat'].toString()) ?? 0.0,
       deliveryLng: double.tryParse(json['delivery_lon'].toString()) ?? 0.0,
       pickUpCheckpointDetails: Checkpoint.fromJson(
-        json['pickup _checkpoint_details'] ??
-            json['pickup_checkpoint_details'] ??
-            (json.entries
-                .firstWhere(
-                  (e) =>
-                      e.key.replaceAll(' ', '') == 'pickup_checkpoint_details',
-                  orElse: () => const MapEntry('', {}),
-                )
-                .value),
+        json['pickup_checkpoint_details'] ?? {},
       ),
 
       deliveryCheckpointDetails: Checkpoint.fromJson(
@@ -262,7 +271,7 @@ class RouteModel {
       "overview_polyline": overviewPolyline,
       "pickup_lat": pickUpLat,
       "pickup_lon": pickUpLng,
-      "pickup _checkpoint_details": pickUpCheckpointDetails.toJson(),
+      "pickup_checkpoint_details": pickUpCheckpointDetails.toJson(),
       "delivery_lat": deliveryLat,
       "delivery_lon": deliveryLng,
       "delivery_checkpoint_details": deliveryCheckpointDetails.toJson(),
@@ -324,9 +333,7 @@ class ShipmentRequest {
   final String whoPays;
   final String scheduledPickupAt;
   final String additionalDetails;
-
-  final List<String> media;
-
+  final List<String> media; // خليها موجودة لأغراض أخرى إذا احتجتها
   final RouteRequest route;
 
   ShipmentRequest({
@@ -350,11 +357,69 @@ class ShipmentRequest {
       "who_pays": whoPays,
       "scheduled_pickup_at": scheduledPickupAt,
       "additional_details": additionalDetails,
-
       "media": media,
-
       "route": route.toJson(),
     };
+  }
+
+  /// يبني FormData يرسل الحقول متداخلة بصيغة Laravel + الصور كملفات
+  Future<FormData> toFormData(List<File> images) async {
+    final map = <String, dynamic>{
+      "goods_type": goodsType,
+      "weight": weight,
+      "vehicle_type": vehicleType,
+      "vehicle_capacity_kg": vehicleCapacityKg,
+      "who_pays": whoPays,
+      "scheduled_pickup_at": scheduledPickupAt,
+      "additional_details": additionalDetails,
+
+      "route[overview_polyline]": route.overviewPolyline,
+      "route[pickup_lat]": route.pickUpLat,
+      "route[pickup_lon]": route.pickUpLng,
+      "route[distance]": route.distance,
+      "route[duration_minutes]": route.durationMinutes,
+
+      "route[pickup_checkpoint_details][supervisor_name]":
+          route.pickUpCheckpointDetails.supervisorName,
+      "route[pickup_checkpoint_details][supervisor_phone_number]":
+          route.pickUpCheckpointDetails.supervisorPhoneNumber,
+      "route[pickup_checkpoint_details][address]":
+          route.pickUpCheckpointDetails.address,
+      "route[pickup_checkpoint_details][street]":
+          route.pickUpCheckpointDetails.street,
+      "route[pickup_checkpoint_details][building_number]":
+          route.pickUpCheckpointDetails.buildingNumber,
+
+      "route[delivery_lat]": route.deliveryLat,
+      "route[delivery_lon]": route.deliveryLng,
+
+      "route[delivery_checkpoint_details][supervisor_name]":
+          route.deliveryCheckpointDetails.supervisorName,
+      "route[delivery_checkpoint_details][supervisor_phone_number]":
+          route.deliveryCheckpointDetails.supervisorPhoneNumber,
+      "route[delivery_checkpoint_details][address]":
+          route.deliveryCheckpointDetails.address,
+      "route[delivery_checkpoint_details][street]":
+          route.deliveryCheckpointDetails.street,
+      "route[delivery_checkpoint_details][building_number]":
+          route.deliveryCheckpointDetails.buildingNumber,
+    };
+
+    final formData = FormData.fromMap(map);
+
+    for (final image in images) {
+      formData.files.add(
+        MapEntry(
+          'media[]', // عدّل الاسم لو الباك اند يطلب اسم مختلف (مثلاً images[])
+          await MultipartFile.fromFile(
+            image.path,
+            filename: image.path.split('/').last,
+          ),
+        ),
+      );
+    }
+    print("عدد الملفات فعلياً داخل FormData: ${formData.files.length}");
+    return formData;
   }
 }
 
@@ -391,7 +456,7 @@ class RouteRequest {
       "overview_polyline": overviewPolyline,
       "pickup_lat": pickUpLat,
       "pickup_lon": pickUpLng,
-      "pickup _checkpoint_details": pickUpCheckpointDetails.toJson(),
+      "pickup_checkpoint_details": pickUpCheckpointDetails.toJson(),
       "delivery_lat": deliveryLat,
       "delivery_lon": deliveryLng,
       "delivery_checkpoint_details": deliveryCheckpointDetails.toJson(),

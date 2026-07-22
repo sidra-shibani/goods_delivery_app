@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_state.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/presentation/screen/Auth/logIn_screen.dart';
@@ -12,25 +15,6 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  String? name;
-  String? phone;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    final n = await SharedPreferencesHelper.getName();
-    final p = await SharedPreferencesHelper.getPhone();
-
-    setState(() {
-      name = n;
-      phone = p;
-    });
-  }
-
   Widget _buildTile(IconData icon, String title, VoidCallback onTap) {
     return Column(
       children: [
@@ -80,23 +64,51 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
                     const SizedBox(height: 10),
 
-                    Text(
-                      name ?? "المستخدم",
-                      style: GoogleFonts.cairo(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
+                    BlocBuilder<ProfileCubit, ProfileState>(
+                      builder: (context, state) {
+                        if (state is GetProfileLoaded) {
+                          final user = state.me.data;
 
-                    const SizedBox(height: 5),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user.fullName,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
 
-                    Text(
-                      phone ?? "",
-                      style: GoogleFonts.cairo(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                              const SizedBox(height: 5),
+
+                              Text(
+                                user.phoneNumber,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+
+                        if (state is ProfileLoading) {
+                          return Text(
+                            "جاري التحميل...",
+                            style: GoogleFonts.cairo(fontSize: 14),
+                          );
+                        }
+
+                        return Text(
+                          "المستخدم",
+                          style: GoogleFonts.cairo(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

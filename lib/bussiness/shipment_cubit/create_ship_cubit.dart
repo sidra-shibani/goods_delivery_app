@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:goods_delivery_app/datasource/services/directions_service.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreateShipCubit extends Cubit<ShipmentState> {
   final ShipmentRepo repository;
@@ -50,13 +53,29 @@ class CreateShipCubit extends Cubit<ShipmentState> {
   final piecesCountController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
   TextEditingController trucksizeNameController = TextEditingController();
+  final List<File> selectedImages = [];
+  final ImagePicker _picker = ImagePicker();
+
   CreateShipCubit(this.repository) : super(ShipInitial());
+
+  Future<void> pickImages() async {
+    final picked = await _picker.pickMultiImage(imageQuality: 70);
+    if (picked.isEmpty) return;
+
+    selectedImages.addAll(picked.map((x) => File(x.path)));
+    emit(MediaUpdated(List.from(selectedImages)));
+  }
+
+  void removeImage(int index) {
+    selectedImages.removeAt(index);
+    emit(MediaUpdated(List.from(selectedImages)));
+  }
 
   Future<void> createShip(ShipmentRequest request) async {
     emit(ShipLoading());
-
+    print("عدد الصور المختارة قبل الإرسال: ${selectedImages.length}");
     try {
-      final result = await repository.createShipment(request);
+      final result = await repository.createShipment(request, selectedImages);
 
       result.fold(
         (error) {
@@ -71,23 +90,32 @@ class CreateShipCubit extends Cubit<ShipmentState> {
     }
   }
 
-  Future<void> getRouteData({
+  Future<bool> getRouteData({
     required double pickLat,
     required double pickLng,
     required double delLat,
     required double delLng,
   }) async {
-    final result = await DirectionsService.getRoute(
-      originLat: pickLat,
-      originLng: pickLng,
-      destLat: delLat,
-      destLng: delLng,
-    );
+    try {
+      final result = await DirectionsService.getRoute(
+        originLat: pickLat,
+        originLng: pickLng,
+        destLat: delLat,
+        destLng: delLng,
+      );
 
-    polyline = result["polyline"];
-    distance = (result["distance"] as num).toDouble();
-    duration = result["duration"];
+      polyline = result["polyline"];
+      distance = (result["distance"] as num).toDouble();
+      duration = result["duration"];
 
-    emit(RouteCalculatedState()); // اعمل state جديد
+      emit(RouteCalculatedState());
+      return true;
+    } catch (e) {
+      polyline = null;
+      distance = null;
+      duration = null;
+      emit(ShipError("تعذر جلب بيانات المسار، تحقق من اتصال الإنترنت"));
+      return false;
+    }
   }
 }
