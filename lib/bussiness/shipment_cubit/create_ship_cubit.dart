@@ -5,7 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
-import 'package:goods_delivery_app/datasource/services/directions_service.dart';
+import 'package:goods_delivery_app/datasource/webserver/services/directions_service.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
 
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';

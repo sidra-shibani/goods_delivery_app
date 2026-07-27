@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:goods_delivery_app/Data/truck_data.dart';
+import 'package:goods_delivery_app/datasource/Data/truck_data.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
 import 'package:goods_delivery_app/datasource/model/truck_size_model.dart';
 import 'package:goods_delivery_app/presentation/screen/shipment/AdditionalInfoScreen.dart';
@@ -96,9 +96,27 @@ class _TruckSizeScreenState extends State<TruckSizeScreen> {
                         selectedSize = size;
                       });
 
+                      // السعة بالكيلو
                       createshipCubit.trucksizeController.text = size.capacityKg
                           .toString();
+
+                      // الاسم الظاهر للمستخدم
                       createshipCubit.trucksizeNameController.text = size.name;
+
+                      // القيمة التي سترسل للـ API
+                      switch (size.name) {
+                        case "صغيرة":
+                          createshipCubit.trucksizeController.text = "small";
+                          break;
+
+                        case "متوسطة":
+                          createshipCubit.trucksizeController.text = "medium";
+                          break;
+
+                        case "كبيرة":
+                          createshipCubit.trucksizeController.text = "large";
+                          break;
+                      }
                     },
 
                     child: Container(

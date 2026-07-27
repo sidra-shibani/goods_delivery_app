@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_state.dart';
+import 'package:goods_delivery_app/bussiness/Rating_cubit/Rating_state.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/deleteShip_cubit.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
-import 'package:goods_delivery_app/datasource/services/tracking_socket_service.dart';
+import 'package:goods_delivery_app/datasource/webserver/services/tracking_socket_service.dart';
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/helper/core/service_locator.dart';
 import 'package:goods_delivery_app/presentation/screen/Tracking/TripTrackingScreen.dart';
@@ -295,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           const SizedBox(height: 12),
                                           Text(
-                                            "لا يوجد شحنات جارية",
+                                            "لا يوجد شحنات قم بإنشاء أول شحنة",
                                             style: GoogleFonts.cairo(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
@@ -571,7 +573,29 @@ class _OrdersPageState extends State<OrdersPage> {
                     final data = showActive
                         ? activeShipments
                         : finishedShipments;
-
+                    if (allShipments.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.local_shipping_outlined,
+                              size: 70,
+                              color: Colors.grey.shade400,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              "لا يوجد شحنات ",
+                              style: GoogleFonts.cairo(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                     return RefreshIndicator(
                       onRefresh: () async {
                         await context.read<GetShipCubit>().fetchShip();
@@ -581,6 +605,9 @@ class _OrdersPageState extends State<OrdersPage> {
                         itemBuilder: (context, index) {
                           final shipment = data[index];
 
+                          final canDelete =
+                              shipment.status == "created" ||
+                              shipment.status == "scheduled";
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 6,
@@ -597,7 +624,42 @@ class _OrdersPageState extends State<OrdersPage> {
                                   ),
                                 );
                               },
-                              child: OrderCard(shipment: shipment),
+                              child: OrderCard(
+                                shipment: shipment,
+                                canDelete: canDelete,
+                                onDelete: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text("حذف الشحنة"),
+                                      content: const Text(
+                                        "هل أنت متأكد من حذف هذه الشحنة؟",
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, false),
+                                          child: const Text("إلغاء"),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context, true),
+                                          child: const Text(
+                                            "حذف",
+                                            style: TextStyle(color: Colors.red),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  if (confirm == true) {
+                                    context
+                                        .read<DeleteShipCubit>()
+                                        .deleteShipment(shipment.id);
+                                  }
+                                },
+                              ),
                             ),
                           );
                         },
@@ -670,23 +732,136 @@ class ProfilePage extends StatelessWidget {
                 const SizedBox(height: 68),
 
                 // ===== الاسم والبيانات =====
-                BlocBuilder<ProfileCubit, ProfileState>(
+                BlocConsumer<ProfileCubit, ProfileState>(
+                  listener: (context, state) {
+                    if (state is GetProfileLoaded) {
+                      context.read<GetRatingSummeryCubit>().fetchRatingSummery(
+                        state.me.data.id,
+                      );
+                    }
+                  },
                   builder: (context, state) {
                     if (state is GetProfileLoaded) {
                       final myPro = state.me.data;
 
                       return Column(
                         children: [
-                          Text(
-                            myPro.fullName,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.cairo(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.black,
-                            ),
-                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                myPro.fullName,
+                                style: GoogleFonts.cairo(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.black,
+                                ),
+                              ),
 
+                              const SizedBox(width: 10),
+
+                              // Rating Widget
+                              BlocBuilder<GetRatingSummeryCubit, RatingState>(
+                                builder: (context, state) {
+                                  if (state is GetRatingSummeryLoaded) {
+                                    final rating = state.response.data;
+
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 5,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber.shade50,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.amber.shade300,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.star_rounded,
+                                            color: Colors.amber,
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 4),
+
+                                          Text(
+                                            rating.averageRating
+                                                .toStringAsFixed(1),
+                                            style: GoogleFonts.cairo(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+
+                                          const SizedBox(width: 4),
+
+                                          Text(
+                                            "(${rating.ratingsCount})",
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+
+                                  if (state is RatingLoading) {
+                                    return const SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    );
+                                  }
+
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade100,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.star_rounded,
+                                          color: Colors.amber,
+                                          size: 18,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "0.0",
+                                          style: GoogleFonts.cairo(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "(0)",
+                                          style: GoogleFonts.cairo(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 6),
 
                           Text(

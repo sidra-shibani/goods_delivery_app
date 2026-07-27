@@ -9,7 +9,7 @@ import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart'
 import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_state.dart';
 import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/model/rating_model.dart';
-import 'package:goods_delivery_app/datasource/services/reverb_client.dart';
+import 'package:goods_delivery_app/datasource/webserver/services/reverb_client.dart';
 import 'package:goods_delivery_app/helper/core/service_locator.dart';
 import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 

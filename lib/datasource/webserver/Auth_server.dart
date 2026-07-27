@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:goods_delivery_app/const/strings.dart';
+import 'package:goods_delivery_app/datasource/model/otp_model.dart';
 import 'package:goods_delivery_app/datasource/model/register_model.dart';
 
 class AuthService {
@@ -62,8 +63,17 @@ class AuthService {
     );
   }
 
-  // Future<Response> otpVer(String email, String otp) {
-  //   final body = {'identifier': email, 'otp': otp};
-  //   return dio.post('/auth/verify-otp', data: json.encode(body));
-  // }
+  Future<Response> otpSend(SendOtpRequest model) {
+    return dio.post(
+      '/account-center/send-otp',
+      data: json.encode(model.toJson()),
+    );
+  }
+
+  Future<Response> otpVer(VerifyOtpRequest model) {
+    return dio.post(
+      '/account-center/verify-otp',
+      data: json.encode(model.toJson()),
+    );
+  }
 }

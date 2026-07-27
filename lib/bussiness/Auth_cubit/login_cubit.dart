@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 
 import 'package:flutter/material.dart';
 import 'package:goods_delivery_app/datasource/model/login_model.dart';
+import 'package:goods_delivery_app/datasource/model/otp_model.dart';
 import 'package:goods_delivery_app/datasource/model/register_model.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 

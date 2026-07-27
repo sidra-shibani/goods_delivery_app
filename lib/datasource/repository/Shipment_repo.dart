@@ -110,4 +110,42 @@ class ShipmentRepo {
       return Left(ApiError(message: 'Unexpected error: $e'));
     }
   }
+
+  Future<Either<ApiError, DeleteShipResponse>> deleteShip(
+    int shipmentId,
+  ) async {
+    try {
+      final response = await service.deleteShipment(shipmentId);
+
+      return Right(DeleteShipResponse.fromJson(response.data));
+    } on DioException catch (dioErr) {
+      print("TYPE: ${dioErr.type}");
+      print("MESSAGE: ${dioErr.message}");
+      print("ERROR: ${dioErr.error}");
+      print("RESPONSE: ${dioErr.response}");
+
+      final message =
+          dioErr.response?.data['message'] ??
+          dioErr.message ??
+          'Dio network error';
+
+      return Left(
+        ApiError(
+          statusCode: dioErr.response?.statusCode ?? 0,
+          message: message,
+          responseBody: dioErr.response?.data.toString() ?? '',
+        ),
+      );
+    } on SocketException {
+      return Left(
+        ApiError(
+          statusCode: 0,
+          message: 'No Internet connection',
+          responseBody: '',
+        ),
+      );
+    } catch (e) {
+      return Left(ApiError(message: 'Unexpected error: $e'));
+    }
+  }
 }

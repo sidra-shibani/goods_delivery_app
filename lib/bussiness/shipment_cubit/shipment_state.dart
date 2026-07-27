@@ -37,3 +37,9 @@ class MediaUpdated extends ShipmentState {
   final List<File> images;
   MediaUpdated(this.images);
 }
+
+class DeleteShipLoaded extends ShipmentState {
+  final DeleteShipResponse delete;
+
+  DeleteShipLoaded(this.delete);
+}

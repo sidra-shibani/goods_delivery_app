@@ -80,4 +80,8 @@ class ShipmentServer {
       queryParameters: model.toJson(),
     );
   }
+
+  Future<Response> deleteShipment(int shipmentId) async {
+    return await dio.delete("/merchant/shipments/$shipmentId");
+  }
 }

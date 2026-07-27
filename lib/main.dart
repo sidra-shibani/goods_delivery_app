@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Auth_cubit/login_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart';
+import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
@@ -12,7 +13,6 @@ import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Profile_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
 import 'package:goods_delivery_app/datasource/repository/Shipment_repo.dart';
-import 'package:goods_delivery_app/datasource/services/reverb_client.dart';
 
 import 'package:goods_delivery_app/datasource/webserver/Auth_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/profile_server.dart';
@@ -82,6 +82,9 @@ class MyApp extends StatelessWidget {
           BlocProvider<ProfileCubit>(
             create: (context) =>
                 ProfileCubit(context.read<ProfileRepo>())..fetchME(),
+          ),
+          BlocProvider(
+            create: (_) => GetRatingSummeryCubit(RatingRepo(RatingServer())),
           ),
         ],
         child: MaterialApp(

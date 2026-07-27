@@ -591,3 +591,27 @@ class ShipmentPriceData {
     };
   }
 }
+
+class DeleteShipResponse {
+  final String status;
+  final String message;
+  final String? errors;
+
+  DeleteShipResponse({
+    required this.status,
+    required this.message,
+    this.errors,
+  });
+
+  factory DeleteShipResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteShipResponse(
+      status: json["status"] ?? "",
+      message: json["message"] ?? "",
+      errors: json["errors"],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {"status": status, "message": message, "errors": errors};
+  }
+}

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
-import 'package:goods_delivery_app/datasource/services/reverb_client.dart';
+import 'package:goods_delivery_app/datasource/webserver/services/reverb_client.dart';
 
 class TrackingSocketService {
   final ReverbClient reverb;

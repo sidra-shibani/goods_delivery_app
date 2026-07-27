@@ -120,18 +120,25 @@ class OrderDetailsBottomSheet extends StatelessWidget {
                                   : "${ApiConstants.imageBaseUrl}$rawUrl";
 
                               print(imageUrl);
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  imageUrl,
-                                  width: 120,
-                                  height: 120,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
-                                    width: 120,
-                                    height: 120,
-                                    color: Colors.grey.shade300,
-                                    child: const Icon(Icons.broken_image),
+                              return GestureDetector(
+                                onTap: () =>
+                                    _showImageDialog(context, imageUrl),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Hero(
+                                    tag: imageUrl,
+                                    child: Image.network(
+                                      imageUrl,
+                                      width: 120,
+                                      height: 120,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        width: 120,
+                                        height: 120,
+                                        color: Colors.grey.shade300,
+                                        child: const Icon(Icons.broken_image),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               );
@@ -348,6 +355,46 @@ class OrderDetailsBottomSheet extends StatelessWidget {
           Text(title, style: GoogleFonts.cairo(color: Colors.grey.shade700)),
         ],
       ),
+    );
+  }
+
+  void _showImageDialog(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (_) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(16),
+          child: Stack(
+            children: [
+              InteractiveViewer(
+                minScale: 0.8,
+                maxScale: 5,
+                child: Hero(
+                  tag: imageUrl,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(imageUrl, fit: BoxFit.contain),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 10,
+                right: 10,
+                child: CircleAvatar(
+                  backgroundColor: Colors.black54,
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

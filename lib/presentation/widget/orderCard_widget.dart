@@ -5,8 +5,14 @@ import 'package:google_fonts/google_fonts.dart';
 
 class OrderCard extends StatelessWidget {
   final ShipmentData shipment;
-
-  const OrderCard({super.key, required this.shipment});
+  final bool canDelete;
+  final VoidCallback? onDelete;
+  const OrderCard({
+    super.key,
+    required this.shipment,
+    this.canDelete = false,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,26 +67,39 @@ class OrderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 13,
-                          vertical: 7,
-                        ),
-                        decoration: BoxDecoration(
-                          color: getStatusBackgroundColor(shipment.status),
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        child: Text(
-                          getStatusText(shipment.status),
-                          style: GoogleFonts.cairo(
-                            color: getStatusTextColor(shipment.status),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                      Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 13,
+                              vertical: 7,
+                            ),
+                            decoration: BoxDecoration(
+                              color: getStatusBackgroundColor(shipment.status),
+                              borderRadius: BorderRadius.circular(25),
+                            ),
+                            child: Text(
+                              getStatusText(shipment.status),
+                              style: GoogleFonts.cairo(
+                                color: getStatusTextColor(shipment.status),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
                           ),
-                        ),
+
+                          if (canDelete)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                color: Colors.red,
+                              ),
+                              onPressed: onDelete,
+                            ),
+                        ],
                       ),
-                      const Spacer(),
 
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -101,45 +120,46 @@ class OrderCard extends StatelessWidget {
                               fontSize: 11,
                             ),
                           ),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "${shipment.route.distance} كم",
+                                style: GoogleFonts.cairo(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+
+                              const SizedBox(width: 4),
+                              const Icon(Icons.location_on_outlined, size: 16),
+                            ],
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                "تاريخ الطلب : ${DateTime.parse(shipment.createdAt).day}/${DateTime.parse(shipment.createdAt).month}/${DateTime.parse(shipment.createdAt).year}",
+                                style: GoogleFonts.cairo(
+                                  color: Colors.grey.shade700,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.calendar_today_outlined,
+                                size: 15,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
-                  ),
-
-                  const Spacer(),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "${shipment.route.distance} كم",
-                        style: GoogleFonts.cairo(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-
-                      const SizedBox(width: 4),
-                      const Icon(Icons.location_on_outlined, size: 16),
-                    ],
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "تاريخ الطلب : ${DateTime.parse(shipment.createdAt).day}/${DateTime.parse(shipment.createdAt).month}/${DateTime.parse(shipment.createdAt).year}",
-                        style: GoogleFonts.cairo(
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 11,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.calendar_today_outlined, size: 15),
                     ],
                   ),
                 ],

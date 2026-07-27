@@ -22,7 +22,12 @@ class AuthLoadedRegister extends AuthState {
   AuthLoadedRegister(this.response);
 }
 
-// class AuthLoadedOtp extends AuthState {
-//   final ActivationResponse response;
-//   AuthLoadedOtp(this.response);
-// }
+class AuthLoadedSendOtp extends AuthState {
+  final ActivationResponse response;
+  AuthLoadedSendOtp(this.response);
+}
+
+class AuthLoadedVerOtp extends AuthState {
+  final ActivationResponse response;
+  AuthLoadedVerOtp(this.response);
+}

@@ -4,6 +4,7 @@ import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.da
 import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/model/shipment_model.dart';
+import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../const/colors.dart';
 
@@ -64,9 +65,10 @@ class OrderSummaryScreen extends StatelessWidget {
           Future.delayed(const Duration(seconds: 10), () {
             Navigator.pop(context); // close dialog
 
-            Navigator.popUntil(
+            Navigator.pushAndRemoveUntil(
               context,
-              (route) => route.isFirst, // يرجع للهوم
+              MaterialPageRoute(builder: (_) => const HomePage()),
+              (route) => false,
             );
           });
           print("تم انشاء شحنة");

@@ -134,8 +134,8 @@ class _TruckTypeScreenState extends State<TruckTypeScreen> {
 
         switch (title) {
           case "مغلقة":
-            createshipCubit.truckTypeController.text = "closed";
-            pricecubit.truckTypeController.text = "closed";
+            createshipCubit.truckTypeController.text = "covered";
+            pricecubit.truckTypeController.text = "covered";
             break;
 
           case "مفتوحة":
