@@ -573,7 +573,9 @@ class _OrdersPageState extends State<OrdersPage> {
                     final data = showActive
                         ? activeShipments
                         : finishedShipments;
-                    if (allShipments.isEmpty) {
+
+                    // ✅ تحسين حالة عدم وجود بيانات (تستمر في العمل بشكل صحيح)
+                    if (data.isEmpty) {
                       return Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -585,7 +587,9 @@ class _OrdersPageState extends State<OrdersPage> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              "لا يوجد شحنات ",
+                              showActive
+                                  ? "لا توجد طلبات نشطة"
+                                  : "لا توجد طلبات منتهية",
                               style: GoogleFonts.cairo(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -607,7 +611,10 @@ class _OrdersPageState extends State<OrdersPage> {
 
                           final canDelete =
                               shipment.status == "created" ||
-                              shipment.status == "scheduled";
+                              shipment.status == "scheduled" ||
+                              shipment.status == "accepted" ||
+                              shipment.status == "assigned";
+
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                               vertical: 6,
@@ -631,21 +638,21 @@ class _OrdersPageState extends State<OrdersPage> {
                                   final confirm = await showDialog<bool>(
                                     context: context,
                                     builder: (_) => AlertDialog(
-                                      title: const Text("حذف الشحنة"),
+                                      title: const Text("إلغاء الطلبية"),
                                       content: const Text(
-                                        "هل أنت متأكد من حذف هذه الشحنة؟",
+                                        "هل أنت متأكد من إلغاء هذه الطلبية؟",
                                       ),
                                       actions: [
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, false),
-                                          child: const Text("إلغاء"),
+                                          child: const Text("تراجع"),
                                         ),
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, true),
                                           child: const Text(
-                                            "حذف",
+                                            "تأكيد الإلغاء",
                                             style: TextStyle(color: Colors.red),
                                           ),
                                         ),
@@ -656,7 +663,7 @@ class _OrdersPageState extends State<OrdersPage> {
                                   if (confirm == true) {
                                     context
                                         .read<DeleteShipCubit>()
-                                        .deleteShipment(shipment.id);
+                                        .cancelShipment(shipment.id);
                                   }
                                 },
                               ),
@@ -760,67 +767,14 @@ class ProfilePage extends StatelessWidget {
 
                               const SizedBox(width: 10),
 
-                              // Rating Widget
-                              BlocBuilder<GetRatingSummeryCubit, RatingState>(
-                                builder: (context, state) {
-                                  if (state is GetRatingSummeryLoaded) {
-                                    final rating = state.response.data;
-
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.amber.shade50,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: Colors.amber.shade300,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.star_rounded,
-                                            color: Colors.amber,
-                                            size: 18,
-                                          ),
-                                          const SizedBox(width: 4),
-
-                                          Text(
-                                            rating.averageRating
-                                                .toStringAsFixed(1),
-                                            style: GoogleFonts.cairo(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-
-                                          const SizedBox(width: 4),
-
-                                          Text(
-                                            "(${rating.ratingsCount})",
-                                            style: GoogleFonts.cairo(
-                                              fontSize: 12,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }
-
-                                  if (state is RatingLoading) {
-                                    return const SizedBox(
-                                      width: 22,
-                                      height: 22,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    );
-                                  }
+                              // Rating Widget - من نفس داتا البروفايل مباشرة
+                              Builder(
+                                builder: (context) {
+                                  final ratingInfo =
+                                      myPro.merchantProfile?.ratingInfo;
+                                  final average =
+                                      ratingInfo?.averageRating ?? 0.0;
+                                  final count = ratingInfo?.totalRatings ?? 0;
 
                                   return Container(
                                     padding: const EdgeInsets.symmetric(
@@ -828,8 +782,11 @@ class ProfilePage extends StatelessWidget {
                                       vertical: 5,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.grey.shade100,
+                                      color: Colors.amber.shade50,
                                       borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.amber.shade300,
+                                      ),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -841,18 +798,19 @@ class ProfilePage extends StatelessWidget {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          "0.0",
+                                          average.toStringAsFixed(1),
                                           style: GoogleFonts.cairo(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
+                                            color: Colors.black87,
                                           ),
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          "(0)",
+                                          "($count)",
                                           style: GoogleFonts.cairo(
                                             fontSize: 12,
-                                            color: Colors.grey,
+                                            color: Colors.grey.shade600,
                                           ),
                                         ),
                                       ],

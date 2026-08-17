@@ -1,13 +1,32 @@
 {
   "project_info": {
-    "project_number": "860697077653",
-    "project_id": "goods-delivery-app-c7fe2",
-    "storage_bucket": "goods-delivery-app-c7fe2.firebasestorage.app"
+    "project_number": "534706200334",
+    "project_id": "shiproute-bf703",
+    "storage_bucket": "shiproute-bf703.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:860697077653:android:04a113609000e6762eb89c",
+        "mobilesdk_app_id": "1:534706200334:android:37fe4f9e06ec4537b3c15f",
+        "android_client_info": {
+          "package_name": "com.example.driver_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3m65sIDxTptSoZxgsm4laf-LQ4CjPBYM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534706200334:android:1613358da907c192b3c15f",
         "android_client_info": {
           "package_name": "com.example.goods_delivery_app"
         }
@@ -15,7 +34,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCBEx4bLxfHURVDu4euSd1_wBsB8zXJR6Q"
+          "current_key": "AIzaSyD3m65sIDxTptSoZxgsm4laf-LQ4CjPBYM"
         }
       ],
       "services": {

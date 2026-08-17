@@ -81,7 +81,7 @@ class ShipmentServer {
     );
   }
 
-  Future<Response> deleteShipment(int shipmentId) async {
-    return await dio.delete("/merchant/shipments/$shipmentId");
+  Future<Response> cancelShipment(int shipmentId) async {
+    return await dio.patch("/merchant/shipments/$shipmentId");
   }
 }

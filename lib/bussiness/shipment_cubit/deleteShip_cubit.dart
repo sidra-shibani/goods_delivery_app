@@ -7,9 +7,9 @@ class DeleteShipCubit extends Cubit<ShipmentState> {
 
   DeleteShipCubit(this.repository) : super(ShipInitial());
 
-  Future<void> deleteShipment(int shipmentId) async {
+  Future<void> cancelShipment(int shipmentId) async {
     emit(ShipLoading());
-    final response = await repository.deleteShip(shipmentId);
+    final response = await repository.cancelShip(shipmentId);
     print(response);
     response.fold((error) {
       emit(ShipError(error.message));

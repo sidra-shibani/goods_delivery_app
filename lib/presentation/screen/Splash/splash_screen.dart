@@ -5,7 +5,8 @@ import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
 import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/onboarding/onboarding_screen.dart';
-
+import 'package:goods_delivery_app/helper/core/service_locator.dart';
+import 'package:goods_delivery_app/notifications/repo/notification_repo.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../auth/login_screen.dart';
@@ -52,11 +53,12 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
 
     final token = await SharedPreferencesHelper.getToken();
-
+    //TODO: call fetch and update function from notifiction repo
     if (!mounted) return;
 
     // المستخدم مسجل دخول
     if (token != null) {
+      sl<NotificationRepo>().fetchAndSendFcmToken();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => MainHomeScreen()),

@@ -111,11 +111,11 @@ class ShipmentRepo {
     }
   }
 
-  Future<Either<ApiError, DeleteShipResponse>> deleteShip(
+  Future<Either<ApiError, DeleteShipResponse>> cancelShip(
     int shipmentId,
   ) async {
     try {
-      final response = await service.deleteShipment(shipmentId);
+      final response = await service.cancelShipment(shipmentId);
 
       return Right(DeleteShipResponse.fromJson(response.data));
     } on DioException catch (dioErr) {

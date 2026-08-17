@@ -1,3 +1,5 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,6 +9,7 @@ import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart'
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 
 import 'package:goods_delivery_app/bussiness/shipment_cubit/create_ship_cubit.dart';
+import 'package:goods_delivery_app/bussiness/shipment_cubit/deleteShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/price_cubit.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
@@ -20,14 +23,20 @@ import 'package:goods_delivery_app/datasource/webserver/rating_server.dart';
 import 'package:goods_delivery_app/datasource/webserver/shipment_server.dart';
 
 import 'package:goods_delivery_app/helper/core/service_locator.dart';
+import 'package:goods_delivery_app/notifications/services/firebase_push_notification_service_impl.dart';
+import 'package:goods_delivery_app/notifications/services/push_notification_service.dart';
 import 'package:goods_delivery_app/presentation/screen/Splash/splash_screen.dart';
 
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   await initServiceLocator();
+  await sl.get<PushNotificationService>().initialize();
   //await sl<ReverbClient>().init();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   runApp(MyApp());
 }
@@ -85,6 +94,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (_) => GetRatingSummeryCubit(RatingRepo(RatingServer())),
+          ),
+          BlocProvider<DeleteShipCubit>(
+            create: (context) => DeleteShipCubit(context.read<ShipmentRepo>()),
           ),
         ],
         child: MaterialApp(
