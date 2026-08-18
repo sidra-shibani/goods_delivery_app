@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
@@ -6,7 +8,8 @@ import 'package:goods_delivery_app/bussiness/Rating_cubit/Rating_state.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/deleteShip_cubit.dart';
-
+import 'package:goods_delivery_app/helper/core/service_locator.dart';
+import 'package:goods_delivery_app/notifications/repo/notification_repo.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/shipment_state.dart';
 import 'package:goods_delivery_app/datasource/repository/Rating_repo.dart';
@@ -266,6 +269,18 @@ class _HomePageState extends State<HomePage> {
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final result = await sl<NotificationRepo>()
+                                .testNotification();
+                            if (result) {
+                              log('✅ تم إرسال إشعار الاختبار بنجاح');
+                            } else {
+                              log('❌ فشل إرسال إشعار الاختبار');
+                            }
+                          },
+                          child: const Text('اختبار الإشعارات'),
                         ),
                         //const SizedBox(height: 15),
                         Expanded(

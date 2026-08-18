@@ -94,6 +94,18 @@ class NotificationRepoImpl implements NotificationRepo {
     }
   }
 
+  @override
+  Future<bool> testNotification() async {
+    try {
+      final response = await dio.get('/notification-test');
+      log('🔔 Test Notification Response: ${response.data}');
+      return response.statusCode == 200;
+    } catch (e) {
+      log('❌ Error testing notification: $e');
+      return false;
+    }
+  }
+
   // @override
   // Future<Either<Failure, String>> getFcmToken() async {
   //   try {

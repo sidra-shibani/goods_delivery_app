@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/Rating_state.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart';
@@ -33,15 +34,17 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
   Set<Polyline> polylines = {};
   Set<Marker> markers = {};
   List<LatLng> polylinePoints = [];
+  BitmapDescriptor? driverIcon;
 
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
       await sl<ReverbClient>().init();
+      await _loadDriverIcon();
       await _loadRoute();
-      _setupMapData();
-      setState(() {});
+
+      if (mounted) setState(() {});
     });
     Future.microtask(() {
       final driverId = widget.shipment.driver?.userId;
@@ -50,42 +53,6 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
         context.read<GetRatingSummeryCubit>().fetchRatingSummery(driverId);
       }
     });
-  }
-
-  void _setupMapData() {
-    final pickup = LatLng(
-      widget.shipment.route.pickUpLat,
-      widget.shipment.route.pickUpLng,
-    );
-
-    final delivery = LatLng(
-      widget.shipment.route.deliveryLat,
-      widget.shipment.route.deliveryLng,
-    );
-
-    markers = {
-      Marker(
-        markerId: const MarkerId("pickup"),
-        position: pickup,
-        infoWindow: const InfoWindow(title: "Pickup"),
-      ),
-      Marker(
-        markerId: const MarkerId("delivery"),
-        position: delivery,
-        infoWindow: const InfoWindow(title: "Delivery"),
-      ),
-    };
-
-    if (polylinePoints.isNotEmpty) {
-      polylines = {
-        Polyline(
-          polylineId: const PolylineId("route"),
-          points: polylinePoints,
-          color: Colors.blue,
-          width: 5,
-        ),
-      };
-    }
   }
 
   void _fitBounds() {
@@ -117,27 +84,7 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
 
   Future<void> _loadRoute() async {
     polylinePoints = decodePolyline(widget.shipment.route.overviewPolyline);
-    markers = {
-      Marker(
-        markerId: const MarkerId("pickup"),
-        position: LatLng(
-          widget.shipment.route.pickUpLat,
-          widget.shipment.route.pickUpLng,
-        ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        infoWindow: const InfoWindow(title: "موقع التحميل"),
-      ),
-
-      Marker(
-        markerId: const MarkerId("delivery"),
-        position: LatLng(
-          widget.shipment.route.deliveryLat,
-          widget.shipment.route.deliveryLng,
-        ),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        infoWindow: const InfoWindow(title: "موقع التسليم"),
-      ),
-    };
+    markers = _buildStaticMarkers();
 
     polylines = {
       Polyline(
@@ -150,6 +97,61 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
 
     if (mounted) {
       setState(() {});
+    }
+  }
+
+  Set<Marker> _buildStaticMarkers() {
+    final pickup = LatLng(
+      widget.shipment.route.pickUpLat,
+      widget.shipment.route.pickUpLng,
+    );
+
+    final delivery = LatLng(
+      widget.shipment.route.deliveryLat,
+      widget.shipment.route.deliveryLng,
+    );
+
+    return {
+      Marker(
+        markerId: const MarkerId("pickup"),
+        position: pickup,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        infoWindow: const InfoWindow(title: "موقع التحميل"),
+      ),
+      Marker(
+        markerId: const MarkerId("delivery"),
+        position: delivery,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        infoWindow: const InfoWindow(title: "موقع التسليم"),
+      ),
+    };
+  }
+
+  Future<void> _loadDriverIcon() async {
+    print("========== START LOAD DRIVER ICON ==========");
+
+    try {
+      print("1 - before BitmapDescriptor.asset");
+
+      final icon = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(50, 50)),
+        'assets/images/truck_open.png',
+      );
+
+      print("2 - BitmapDescriptor.asset SUCCESS");
+
+      if (!mounted) return;
+
+      setState(() {
+        driverIcon = icon;
+      });
+
+      print("3 - DRIVER ICON SET");
+    } catch (e, stackTrace) {
+      print("========== DRIVER ICON ERROR ==========");
+      print("ERROR: $e");
+      print("STACK: $stackTrace");
+      print("=======================================");
     }
   }
 
@@ -173,8 +175,30 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
                   log('connecting');
                 }
                 if (state is TrackingLocationUpdated) {
+                  final driverPosition = state.position;
+
                   log(
-                    '${state.position.latitude} , ${state.position.longitude}',
+                    '${driverPosition.latitude} , ${driverPosition.longitude}',
+                  );
+
+                  if (driverIcon == null) return;
+
+                  setState(() {
+                    markers.removeWhere(
+                      (marker) => marker.markerId.value == "driver",
+                    );
+
+                    markers.add(
+                      Marker(
+                        markerId: const MarkerId("driver"),
+                        position: driverPosition,
+                        icon: driverIcon!,
+                        infoWindow: const InfoWindow(title: "السائق"),
+                      ),
+                    );
+                  });
+                  mapController?.animateCamera(
+                    CameraUpdate.newLatLngZoom(driverPosition, 15),
                   );
                 }
               },

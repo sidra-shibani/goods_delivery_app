@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1700),
+      duration: const Duration(milliseconds: 5000),
     );
 
     _logoAnimation = Tween<double>(
@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigate() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 20));
 
     final token = await SharedPreferencesHelper.getToken();
     //TODO: call fetch and update function from notifiction repo
@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Padding(
                         padding: const EdgeInsets.all(22),
                         child: Image.asset(
-                          "assets/images/food truck-ref.png",
+                          "assets/images/logo.png",
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -125,7 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
                   FadeTransition(
                     opacity: _textAnimation,
                     child: Text(
-                      "FreshWay",
+                      "حُمولَة",
                       style: GoogleFonts.cairo(
                         color: Colors.white,
                         fontSize: 34,
@@ -140,7 +140,7 @@ class _SplashScreenState extends State<SplashScreen>
                   FadeTransition(
                     opacity: _textAnimation,
                     child: Text(
-                      "Delivering Freshness with Care",
+                      "توصيل سريع آمن",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.cairo(
                         color: Colors.white70,
