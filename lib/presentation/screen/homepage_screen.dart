@@ -1,13 +1,16 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_state.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/Rating_state.dart';
+import 'package:goods_delivery_app/bussiness/Rating_cubit/giveRating_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Rating_cubit/rating_summery_cubit.dart';
 import 'package:goods_delivery_app/bussiness/Tracking_cubit/tracking_cubit.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/deleteShip_cubit.dart';
+import 'package:goods_delivery_app/datasource/model/rating_model.dart';
 import 'package:goods_delivery_app/helper/core/service_locator.dart';
 import 'package:goods_delivery_app/notifications/repo/notification_repo.dart';
 import 'package:goods_delivery_app/bussiness/shipment_cubit/getShip_cubit.dart';
@@ -25,6 +28,7 @@ import 'package:goods_delivery_app/presentation/widget/orderCard_widget.dart';
 import 'package:goods_delivery_app/presentation/widget/shipmentBottomSheet_widget.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:goods_delivery_app/const/colors.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({super.key});
@@ -582,9 +586,10 @@ class _OrdersPageState extends State<OrdersPage> {
                     }).toList();
 
                     final finishedShipments = allShipments.where((s) {
-                      return s.status == "cancelled" || s.status == "expired";
+                      return s.status == "delivered" ||
+                          s.status == "cancelled" ||
+                          s.status == "expired";
                     }).toList();
-
                     final data = showActive
                         ? activeShipments
                         : finishedShipments;
@@ -646,41 +651,222 @@ class _OrdersPageState extends State<OrdersPage> {
                                   ),
                                 );
                               },
-                              child: OrderCard(
-                                shipment: shipment,
-                                canDelete: canDelete,
-                                onDelete: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                      title: const Text("إلغاء الطلبية"),
-                                      content: const Text(
-                                        "هل أنت متأكد من إلغاء هذه الطلبية؟",
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context, false),
-                                          child: const Text("تراجع"),
-                                        ),
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context, true),
-                                          child: const Text(
-                                            "تأكيد الإلغاء",
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                              child: Column(
+                                children: [
+                                  OrderCard(
+                                    shipment: shipment,
+                                    canDelete: canDelete,
+                                    showRating:
+                                        !showActive &&
+                                        shipment.status == "delivered",
+                                    onRating: () {
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (dialogContext) {
+                                          return BlocProvider(
+                                            create: (_) => GiveratingCubit(
+                                              context.read<RatingRepo>(),
+                                            ),
+                                            child: AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(18),
+                                              ),
+                                              title: Text(
+                                                "تقييم الرحلة",
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.cairo(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                              content: SingleChildScrollView(
+                                                child: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      "كيف كانت تجربتك مع السائق؟",
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: GoogleFonts.cairo(
+                                                        fontSize: 14,
+                                                        color: Colors
+                                                            .grey
+                                                            .shade700,
+                                                      ),
+                                                    ),
 
-                                  if (confirm == true) {
-                                    context
-                                        .read<DeleteShipCubit>()
-                                        .cancelShipment(shipment.id);
-                                  }
-                                },
+                                                    const SizedBox(height: 20),
+
+                                                    // ⭐ النجوم
+                                                    _RatingStars(),
+
+                                                    const SizedBox(height: 20),
+
+                                                    // 💬 التعليق
+                                                    TextField(
+                                                      controller: dialogContext
+                                                          .read<
+                                                            GiveratingCubit
+                                                          >()
+                                                          .commentController,
+                                                      maxLines: 3,
+                                                      textDirection:
+                                                          TextDirection.rtl,
+                                                      decoration: InputDecoration(
+                                                        hintText:
+                                                            "اكتب تعليقك هنا...",
+                                                        hintStyle:
+                                                            GoogleFonts.cairo(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 13,
+                                                            ),
+                                                        border: OutlineInputBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                        ),
+                                                        focusedBorder:
+                                                            OutlineInputBorder(
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    10,
+                                                                  ),
+                                                              borderSide: BorderSide(
+                                                                color: AppColors
+                                                                    .mainblue,
+                                                              ),
+                                                            ),
+                                                      ),
+                                                    ),
+
+                                                    const SizedBox(height: 20),
+
+                                                    // زر الإرسال
+                                                    BlocBuilder<
+                                                      GiveratingCubit,
+                                                      RatingState
+                                                    >(
+                                                      builder: (context, state) {
+                                                        if (state
+                                                            is RatingLoading) {
+                                                          return const SizedBox(
+                                                            height: 50,
+                                                            child: Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            ),
+                                                          );
+                                                        }
+
+                                                        return SizedBox(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 50,
+                                                          child: ElevatedButton(
+                                                            onPressed: () {
+                                                              final cubit = context
+                                                                  .read<
+                                                                    GiveratingCubit
+                                                                  >();
+
+                                                              print(
+                                                                "⭐ Rating = ${cubit.rating}",
+                                                              );
+
+                                                              print(
+                                                                "💬 Comment = ${cubit.commentController.text}",
+                                                              );
+
+                                                              final request =
+                                                                  GiveRatingRequest(
+                                                                    rating:
+                                                                        cubit
+                                                                            .rating ??
+                                                                        0,
+                                                                    comment: cubit
+                                                                        .commentController
+                                                                        .text,
+                                                                  );
+
+                                                              cubit.giveRating(
+                                                                request,
+                                                                shipment.id,
+                                                              );
+                                                            },
+                                                            style: ElevatedButton.styleFrom(
+                                                              backgroundColor:
+                                                                  AppColors
+                                                                      .mainblue,
+                                                              shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                      8,
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                            child: Text(
+                                                              "تم",
+                                                              style: GoogleFonts.cairo(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    },
+                                    onDelete: () async {
+                                      final confirm = await showDialog<bool>(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text("إلغاء الطلبية"),
+                                          content: const Text(
+                                            "هل أنت متأكد من إلغاء هذه الطلبية؟",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, false),
+                                              child: const Text("تراجع"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context, true),
+                                              child: const Text(
+                                                "تأكيد الإلغاء",
+                                                style: TextStyle(
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      if (confirm == true) {
+                                        context
+                                            .read<DeleteShipCubit>()
+                                            .cancelShipment(shipment.id);
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -715,10 +901,66 @@ class _OrdersPageState extends State<OrdersPage> {
     );
   }
 }
+
+class _RatingStars extends StatefulWidget {
+  @override
+  State<_RatingStars> createState() => _RatingStarsState();
+}
+
+class _RatingStarsState extends State<_RatingStars> {
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<GiveratingCubit>();
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(5, (index) {
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              cubit.updateRating(index + 1);
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Icon(
+              Icons.star_rounded,
+              color: index < cubit.rating ? Colors.amber : Colors.grey,
+              size: 30,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+}
 // ================= PROFILE PAGE =================
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String? profileImageUrl;
+  File? selectedProfileImage;
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickProfileImage() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image == null) return;
+
+    setState(() {
+      selectedProfileImage = File(image.path);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -760,6 +1002,9 @@ class ProfilePage extends StatelessWidget {
                       context.read<GetRatingSummeryCubit>().fetchRatingSummery(
                         state.me.data.id,
                       );
+                      setState(() {
+                        profileImageUrl = state.me.data.profilePictureUrl;
+                      });
                     }
                   },
                   builder: (context, state) {
@@ -987,38 +1232,48 @@ class ProfilePage extends StatelessWidget {
                         ],
                       ),
                       child: ClipOval(
-                        child: Image.network(
-                          // استبدلها بـ Image.asset("assets/images/avatar.png")
-                          "https://api.dicebear.com/7.x/adventurer/png?seed=Laiba",
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Icon(
-                            Icons.person,
-                            size: 50,
-                            color: AppColors.mainblue,
-                          ),
-                        ),
+                        child:
+                            profileImageUrl != null &&
+                                profileImageUrl!.isNotEmpty
+                            ? Image.network(
+                                profileImageUrl!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: AppColors.mainblue,
+                                ),
+                              )
+                            : const Icon(
+                                Icons.person,
+                                size: 50,
+                                color: AppColors.mainblue,
+                              ),
                       ),
                     ),
                     Positioned(
                       bottom: -2,
                       right: -2,
-                      child: Container(
-                        width: 26,
-                        height: 26,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.edit,
-                          size: 14,
-                          color: AppColors.naturalgray,
+                      child: GestureDetector(
+                        onTap: _pickProfileImage,
+                        child: Container(
+                          width: 26,
+                          height: 26,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 4,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.edit,
+                            size: 14,
+                            color: AppColors.naturalgray,
+                          ),
                         ),
                       ),
                     ),

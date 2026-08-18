@@ -41,4 +41,35 @@ class ProfileRepo {
       return Left(ApiError(message: 'Unexpected error: $e'));
     }
   }
+
+  Future<Either<ApiError, MeResponse>> updateProfilePicture(File image) async {
+    try {
+      final response = await service.updateProfilePicture(image);
+
+      return Right(MeResponse.fromJson(response.data));
+    } on DioException catch (dioErr) {
+      final message =
+          dioErr.response?.data['message'] ??
+          dioErr.message ??
+          'Dio network error';
+
+      return Left(
+        ApiError(
+          statusCode: dioErr.response?.statusCode ?? 0,
+          message: message,
+          responseBody: dioErr.response?.data.toString() ?? '',
+        ),
+      );
+    } on SocketException {
+      return Left(
+        ApiError(
+          statusCode: 0,
+          message: 'No Internet connection',
+          responseBody: '',
+        ),
+      );
+    } catch (e) {
+      return Left(ApiError(message: 'Unexpected error: $e'));
+    }
+  }
 }

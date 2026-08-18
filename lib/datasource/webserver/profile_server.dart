@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'dart:developer';
@@ -62,5 +64,19 @@ class ProfileServer {
 
   Future<Response> getMyProfile() {
     return dio.get('/me');
+  }
+
+  Future<Response> updateProfilePicture(File image) async {
+    final formData = FormData.fromMap({
+      'profile_picture': await MultipartFile.fromFile(
+        image.path,
+        filename: image.path.split('/').last,
+      ),
+    });
+
+    return dio.post(
+      '/account-center/settings/update-profile-picture',
+      data: formData,
+    );
   }
 }

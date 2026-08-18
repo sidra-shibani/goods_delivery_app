@@ -62,12 +62,12 @@ class OrderSummaryScreen extends StatelessWidget {
             },
           );
 
-          Future.delayed(const Duration(seconds: 10), () {
+          Future.delayed(const Duration(seconds: 5), () {
             Navigator.pop(context); // close dialog
 
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const HomePage()),
+              MaterialPageRoute(builder: (_) => const MainHomeScreen()),
               (route) => false,
             );
           });
@@ -254,12 +254,12 @@ class OrderSummaryScreen extends StatelessWidget {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(height: 15),
+                                          SizedBox(height: 13),
                                           Text(
                                             createShipCubit
                                                         .truckTypeController
                                                         .text ==
-                                                    "closed"
+                                                    "covered"
                                                 ? "مغلقة"
                                                 : createShipCubit
                                                           .truckTypeController

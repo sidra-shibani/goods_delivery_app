@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:goods_delivery_app/bussiness/Profile_cubit/profile_state.dart';
 
@@ -16,5 +18,20 @@ class ProfileCubit extends Cubit<ProfileState> {
     response.fold((error) {
       emit(ProfileError(error.message));
     }, (data) => emit(GetProfileLoaded(data)));
+  }
+
+  Future<void> updateProfilePicture(File image) async {
+    emit(ProfileLoading());
+
+    final result = await repository.updateProfilePicture(image);
+
+    result.fold(
+      (error) {
+        emit(ProfileError(error.message));
+      },
+      (profile) {
+        emit(GetProfileLoaded(profile));
+      },
+    );
   }
 }

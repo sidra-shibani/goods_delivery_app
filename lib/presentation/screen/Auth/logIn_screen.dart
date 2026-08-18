@@ -6,6 +6,8 @@ import 'package:goods_delivery_app/const/colors.dart';
 import 'package:goods_delivery_app/datasource/repository/Auth_repo.dart';
 
 import 'package:goods_delivery_app/helper/core/SharedPreferencesHelper.dart';
+import 'package:goods_delivery_app/helper/core/service_locator.dart';
+import 'package:goods_delivery_app/notifications/repo/notification_repo.dart';
 import 'package:goods_delivery_app/presentation/screen/homepage_screen.dart';
 import 'package:goods_delivery_app/presentation/screen/Auth/resetpassword_screen.dart';
 
@@ -38,7 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
               await SharedPreferencesHelper.saveName(username);
               //  await SharedPreferencesHelper.savePhone(phone);
             }
+            await sl<NotificationRepo>().fetchAndSendFcmToken();
 
+            if (!context.mounted) return;
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (_) => MainHomeScreen()),

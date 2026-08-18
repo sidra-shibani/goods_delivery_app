@@ -135,7 +135,7 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
 
       final icon = await BitmapDescriptor.asset(
         const ImageConfiguration(size: Size(50, 50)),
-        'assets/images/truck_open.png',
+        'assets/images/markerTruck1.png',
       );
 
       print("2 - BitmapDescriptor.asset SUCCESS");
@@ -167,7 +167,7 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
       body: Stack(
         children: [
           Container(
-            height: 500,
+            height: 550,
             width: double.maxFinite,
             child: BlocListener<TrackingCubit, TrackingState>(
               listener: (context, state) {
@@ -198,7 +198,7 @@ class _TripTrackingScreenState extends State<TripTrackingScreen> {
                     );
                   });
                   mapController?.animateCamera(
-                    CameraUpdate.newLatLngZoom(driverPosition, 15),
+                    CameraUpdate.newLatLngZoom(driverPosition, 9),
                   );
                 }
               },

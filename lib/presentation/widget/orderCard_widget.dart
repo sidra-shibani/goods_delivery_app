@@ -7,24 +7,25 @@ class OrderCard extends StatelessWidget {
   final ShipmentData shipment;
   final bool canDelete;
   final VoidCallback? onDelete;
+  final bool showRating;
+  final VoidCallback? onRating;
   const OrderCard({
     super.key,
     required this.shipment,
     this.canDelete = false,
     this.onDelete,
+    this.showRating = false,
+    this.onRating,
   });
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 110,
+      height: showRating ? 170 : 140,
 
       decoration: BoxDecoration(
         color: const Color(0xffF7F4EC),
-
         borderRadius: BorderRadius.circular(12),
-
-        border: Border.all(color: const Color(0xffE2B646), width: 1),
+        border: Border.all(color: AppColors.yallow, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -37,236 +38,275 @@ class OrderCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
 
-        child: Row(
-          textDirection: TextDirection.rtl,
-
+        child: Column(
           children: [
-            Container(
-              width: 80,
-              height: 65,
-
-              decoration: BoxDecoration(
-                color: const Color(0xffF2D27B),
-                borderRadius: BorderRadius.circular(10),
-              ),
-
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-
-                child: Image.asset(
-                  "assets/images/ordertrck.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Row(
+                textDirection: TextDirection.rtl,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 13,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: getStatusBackgroundColor(shipment.status),
-                              borderRadius: BorderRadius.circular(25),
-                            ),
-                            child: Text(
-                              getStatusText(shipment.status),
-                              style: GoogleFonts.cairo(
-                                color: getStatusTextColor(shipment.status),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ),
-
-                          if (canDelete)
-                            IconButton(
-                              icon: const Icon(
-                                Icons.delete_outline,
-                                color: Colors.red,
-                              ),
-                              onPressed: onDelete,
-                            ),
-                        ],
+                  Container(
+                    width: 60,
+                    height: 65,
+                    decoration: BoxDecoration(
+                      color: AppColors.yallow,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        "assets/images/ordertrck.png",
+                        fit: BoxFit.contain,
                       ),
+                    ),
+                  ),
 
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "طلب رقم ${shipment.id}",
-                            style: GoogleFonts.cairo(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
-                          ),
+                  const SizedBox(width: 12),
 
-                          Text(
-                            "نوع الطلب : ${shipment.goodsType}",
-                            style: GoogleFonts.cairo(
-                              color: Colors.grey.shade700,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
-                            ),
-                          ),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                "${shipment.route.distance} كم",
-                                style: GoogleFonts.cairo(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ===== الحالة + الحذف =====
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 7,
                               ),
-
-                              const SizedBox(width: 4),
-                              const Icon(Icons.location_on_outlined, size: 16),
-                            ],
-                          ),
-
-                          const SizedBox(height: 4),
-
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Text(
-                                "تاريخ الطلب : ${DateTime.parse(shipment.createdAt).day}/${DateTime.parse(shipment.createdAt).month}/${DateTime.parse(shipment.createdAt).year}",
+                              decoration: BoxDecoration(
+                                color: getStatusBackgroundColor(
+                                  shipment.status,
+                                ),
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                              child: Text(
+                                getStatusText(shipment.status),
                                 style: GoogleFonts.cairo(
-                                  color: Colors.grey.shade700,
+                                  color: getStatusTextColor(shipment.status),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11,
                                 ),
                               ),
-                              const SizedBox(width: 4),
-                              const Icon(
-                                Icons.calendar_today_outlined,
-                                size: 15,
+                            ),
+
+                            if (canDelete) ...[
+                              const SizedBox(height: 5),
+                              GestureDetector(
+                                onTap: onDelete,
+                                child: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.red,
+                                  size: 25,
+                                ),
                               ),
                             ],
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+
+                        // ===== بيانات الطلب =====
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "طلب رقم ${shipment.id}",
+                              style: GoogleFonts.cairo(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+
+                            Text(
+                              "نوع الطلب : ${shipment.goodsType}",
+                              style: GoogleFonts.cairo(
+                                color: Colors.grey.shade700,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "${shipment.route.distance} كم",
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.location_on_outlined,
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "تاريخ الطلب : "
+                                  "${DateTime.parse(shipment.createdAt).day}/"
+                                  "${DateTime.parse(shipment.createdAt).month}/"
+                                  "${DateTime.parse(shipment.createdAt).year}",
+                                  style: GoogleFonts.cairo(
+                                    color: Colors.grey.shade700,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(
+                                  Icons.calendar_today_outlined,
+                                  size: 15,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
+
+            if (showRating) ...[
+              const SizedBox(height: 8),
+
+              SizedBox(
+                width: double.infinity,
+                height: 40,
+                child: ElevatedButton.icon(
+                  onPressed: onRating,
+
+                  label: Text(
+                    "قم بتقييم الرحلة",
+                    style: GoogleFonts.cairo(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.lightblue,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
-}
 
-String getStatusText(String status) {
-  switch (status) {
-    case "created":
-      return "قيد الإنشاء";
+  String getStatusText(String status) {
+    switch (status) {
+      case "created":
+        return "قيد الإنشاء";
 
-    case "scheduled":
-      return "بالانتظار";
+      case "scheduled":
+        return "بالانتظار";
 
-    case "accepted":
-      return "تم القبول";
+      case "accepted":
+        return "تم القبول";
 
-    case "assigned":
-      return "تم تعيين سائق";
+      case "assigned":
+        return "تم تعيين سائق";
 
-    case "picked_up":
-      return "تم الاستلام";
+      case "picked_up":
+        return "تم الاستلام";
 
-    case "in_transit":
-      return "قيد النقل";
+      case "in_transit":
+        return "قيد النقل";
 
-    case "delivered":
-      return "تم التسليم";
+      case "delivered":
+        return "تم التسليم";
 
-    case "cancelled":
-      return "ملغي";
-    case "expired":
-      return "منتهي الصلاحية";
-    case "on_way_to_pickup":
-      return "في الطريق للاستلام";
+      case "cancelled":
+        return "ملغي";
+      case "expired":
+        return "منتهي الصلاحية";
+      case "on_way_to_pickup":
+        return "في الطريق للاستلام";
 
-    default:
-      return status;
+      default:
+        return status;
+    }
   }
-}
 
-Color getStatusBackgroundColor(String status) {
-  switch (status) {
-    case "created":
-      return AppColors.lightblue;
+  Color getStatusBackgroundColor(String status) {
+    switch (status) {
+      case "created":
+        return AppColors.lightblue;
 
-    case "pending":
-      return Colors.orange.shade100;
+      case "pending":
+        return Colors.orange.shade100;
 
-    case "accepted":
-      return Colors.green.shade100;
+      case "accepted":
+        return Colors.green.shade100;
 
-    case "assigned":
-      return Colors.purple.shade100;
+      case "assigned":
+        return Colors.purple.shade100;
 
-    case "picked_up":
-      return Colors.teal.shade100;
+      case "picked_up":
+        return Colors.teal.shade100;
 
-    case "in_transit":
-      return Colors.indigo.shade100;
+      case "in_transit":
+        return Colors.indigo.shade100;
 
-    case "delivered":
-      return Colors.green.shade200;
+      case "delivered":
+        return Colors.green.shade200;
 
-    case "cancelled":
-      return Colors.red.shade100;
-    case "expired":
-      return Colors.red.shade100;
-    default:
-      return Colors.grey.shade200;
+      case "cancelled":
+        return Colors.red.shade100;
+      case "expired":
+        return Colors.red.shade100;
+      default:
+        return Colors.grey.shade200;
+    }
   }
-}
 
-Color getStatusTextColor(String status) {
-  switch (status) {
-    case "created":
-      return Colors.blue;
+  Color getStatusTextColor(String status) {
+    switch (status) {
+      case "created":
+        return Colors.blue;
 
-    case "pending":
-      return Colors.orange;
+      case "pending":
+        return Colors.orange;
 
-    case "accepted":
-      return Colors.green;
+      case "accepted":
+        return Colors.green;
 
-    case "assigned":
-      return Colors.purple;
+      case "assigned":
+        return Colors.purple;
 
-    case "picked_up":
-      return Colors.teal;
+      case "picked_up":
+        return Colors.teal;
 
-    case "in_transit":
-      return Colors.indigo;
+      case "in_transit":
+        return Colors.indigo;
 
-    case "delivered":
-      return Colors.green.shade800;
+      case "delivered":
+        return Colors.green.shade800;
 
-    case "cancelled":
-      return Colors.red;
-    case "expired":
-      return Colors.red;
-    default:
-      return Colors.grey;
+      case "cancelled":
+        return Colors.red;
+      case "expired":
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }
